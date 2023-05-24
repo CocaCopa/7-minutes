@@ -29,7 +29,7 @@ public class PlayerMovement : MonoBehaviour {
     public Vector3 HandleMovement() {
 
         groundedPlayer = controller.isGrounded;
-        if (groundedPlayer && playerVelocity.y < 0) {
+        if (groundedPlayer && playerVelocity.y <= 0) {
             playerVelocity.y = 0f;
         }
 

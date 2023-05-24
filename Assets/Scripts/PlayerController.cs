@@ -26,29 +26,11 @@ public class PlayerController : MonoBehaviour
         Vector3 rayDirection = Camera.main.transform.forward;
         Ray ray = new (rayOrigin, rayDirection);
 
-        bool foundInteractableObject = Physics.Raycast(ray, out RaycastHit hit, interactDistance, intercatLayer);
 
-        /*//Collider[] colliderArray = Physics.OverlapSphere(Camera.main.transform.position + Camera.main.transform.forward * interactDistance, 0.5f);
+        Physics.Raycast(ray, out RaycastHit hit, interactDistance, intercatLayer);
+        if (hit.transform != null && hit.transform.TryGetComponent(out IInteracteable interactable)) {
 
-        Collider[] colliderArray = Physics.OverlapCapsule(Camera.main.transform.position, Camera.main.transform.position + Camera.main.transform.forward * interactDistance, 0.5f);
-
-        foreach (Collider collider in colliderArray) {
-
-            if (collider.name == "SM_Prop_Dresser_01_Drawer_02 (1)") {
-
-                Debug.Log("--");
-            }
-            if (collider.TryGetComponent(out IInteracteable interactable)) {
-
-                Debug.Log("Found interactableObject");
-                
-                interactable.Interact();
-            }
-        }*/
-
-        if (foundInteractableObject) {
-
-            hit.transform.GetComponent<IInteracteable>().Interact();
+            interactable.Interact();
         }
     }
 
