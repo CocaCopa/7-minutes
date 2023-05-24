@@ -98,6 +98,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d65f5735aa1b1f141a26bbf453eb5d12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  intercatLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &6209496651122007268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,7 +117,10 @@ MonoBehaviour:
   walkSpeed: 2
   sprintSpeed: 7
   accelerationTime: 5
-  jumpHeight: 1
+  jumpHeight: 0.5
+  stairsLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &6209496651563163230
 GameObject:
   m_ObjectHideFlags: 0

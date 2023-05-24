@@ -91,7 +91,7 @@ public class PlayerMovement : MonoBehaviour {
 
     private bool ClimbingStair(Vector3 input) {
 
-        bool onStairs = Physics.Raycast(transform.position + Vector3.up * 0.5f, transform.forward, 2, stairsLayer);
+        bool onStairs = Physics.Raycast(transform.position + Vector3.up * 0.5f, transform.forward, 1, stairsLayer);
         bool movingForward = input.y != 0;
         bool facingUp = Vector3.Dot(Camera.main.transform.forward, Vector3.down) < 0;
 
