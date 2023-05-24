@@ -5,12 +5,12 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour {
 
-    [SerializeField] private float gravityValue = -9.81f;
+    [SerializeField] LayerMask stairsLayer;
     [SerializeField] private float walkSpeed = 2.0f;
     [SerializeField] private float sprintSpeed = 7.0f;
     [SerializeField] private float accelerationTime = 5.0f;
     [SerializeField] private float jumpHeight = 1.0f;
-    [SerializeField] LayerMask stairsLayer;
+    [SerializeField] private float gravityValue = -9.81f;
 
     private CharacterController controller;
     private Transform cameraTransform;

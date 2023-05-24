@@ -50,17 +50,18 @@ public class Door : MonoBehaviour, IInteracteable {
 
         Vector3 doorForward = transform.forward;
         Vector3 playerForward = Camera.main.transform.forward;
+        Debug.Log(Vector3.Dot(doorForward, playerForward));
         return Vector3.Dot(doorForward, playerForward);
     }
 
     private Vector3 NewRotation() {
 
         // Open away from player
-        if (DotProduct() > 0) {
+        if (DotProduct() > 0) { // same direction
 
             return defaultRotationEuler + rotationAmount;
         }
-        else {
+        else {  // opposite direction
 
             return defaultRotationEuler - rotationAmount;
         }

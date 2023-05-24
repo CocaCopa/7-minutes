@@ -4,7 +4,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] LayerMask intercatLayer;
+    [SerializeField] private float interactDistance = 1.5f;
+    [SerializeField] private LayerMask intercatLayer;
     private CharacterController controller;
     private PlayerMovement playerMovement;
 
@@ -23,9 +24,9 @@ public class PlayerController : MonoBehaviour
 
         Vector3 rayOrigin = Camera.main.transform.position;
         Vector3 rayDirection = Camera.main.transform.forward;
-        Ray ray = new Ray(rayOrigin, rayDirection);
+        Ray ray = new (rayOrigin, rayDirection);
 
-        bool foundInteractableObject = Physics.Raycast(ray, out RaycastHit hit, 5, intercatLayer);
+        bool foundInteractableObject = Physics.Raycast(ray, out RaycastHit hit, interactDistance, intercatLayer);
 
         if (foundInteractableObject) {
 
