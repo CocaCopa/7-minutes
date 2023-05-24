@@ -2,36 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Door : MonoBehaviour, IInteracteable {
-
-    [SerializeField] private bool startsOpened;
-    [SerializeField] private float rotationSpeed = 3.5f;
-    [SerializeField] private Vector3 rotationAmount = new(0, 60, 0);
-    [SerializeField] private AnimationCurve animCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-
-    private float animationPoints = 0;
-    private Vector3 defaultRotationEuler;
-    private Quaternion currentRotation;
-    private Vector3 targetRotationEuler;
-    private bool isOpen = false;
+public class Door : ItemOpen, IInteracteable {
 
     private void Awake() {
 
-        defaultRotationEuler = transform.eulerAngles;
-        isOpen = startsOpened;
+        defaultPosition = transform.eulerAngles;
         enabled = false;
     }
 
     private void Update() {
 
         transform.localRotation = SlerpRotation();
+        enabled = DisableUpdateMethod();
     }
 
-    public void Interact() {
+    public override void Interact() {
 
         animationPoints = 0;
-        currentRotation = transform.localRotation;
-        targetRotationEuler = isOpen ? defaultRotationEuler : NewRotation();
+        currentPosition = transform.eulerAngles;
+        targetPosition = isOpen ? defaultPosition : NewRotation();
 
         isOpen = !isOpen;
         enabled = true;
@@ -39,9 +28,9 @@ public class Door : MonoBehaviour, IInteracteable {
 
     private Quaternion SlerpRotation() {
 
-        Quaternion current = currentRotation;
-        Quaternion target = Quaternion.Euler(targetRotationEuler);
-        animationPoints += rotationSpeed * Time.deltaTime;
+        Quaternion current = Quaternion.Euler(currentPosition);
+        Quaternion target = Quaternion.Euler(targetPosition);
+        animationPoints += openSpeed * Time.deltaTime;
 
         return Quaternion.Slerp(current, target, animCurve.Evaluate(animationPoints));
     }
@@ -50,7 +39,7 @@ public class Door : MonoBehaviour, IInteracteable {
 
         Vector3 doorForward = transform.forward;
         Vector3 playerForward = Camera.main.transform.forward;
-        Debug.Log(Vector3.Dot(doorForward, playerForward));
+
         return Vector3.Dot(doorForward, playerForward);
     }
 
@@ -59,11 +48,11 @@ public class Door : MonoBehaviour, IInteracteable {
         // Open away from player
         if (DotProduct() > 0) { // same direction
 
-            return defaultRotationEuler + rotationAmount;
+            return defaultPosition + offsetAmount;
         }
         else {  // opposite direction
 
-            return defaultRotationEuler - rotationAmount;
+            return defaultPosition - offsetAmount;
         }
     }
 }
