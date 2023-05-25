@@ -6,6 +6,13 @@ using UnityEngine.AI;
 public class YokaiBehaviour : MonoBehaviour {
 
     [SerializeField] private GameObject yokaiVisuals;
+
+    [Space(10)]
+
+    [SerializeField] private float rangeToKillPlayer;
+    [SerializeField] private float walkSpeed;
+    [SerializeField] private float runSpeed;
+
     private NavMeshAgent navMeshAgent;
 
     private void Awake() {
@@ -23,6 +30,18 @@ public class YokaiBehaviour : MonoBehaviour {
     public void DisableCharacter() {
 
 
+    }
+
+    public void ChasePlayer(Transform playerTransform) {
+
+        navMeshAgent.destination = playerTransform.position;
+
+        bool nearPlayer = Vector3.Distance(transform.position, playerTransform.position) < rangeToKillPlayer;
+
+        if (nearPlayer) {
+
+            KillPlayer();
+        }
     }
 
     public void KillPlayer() {

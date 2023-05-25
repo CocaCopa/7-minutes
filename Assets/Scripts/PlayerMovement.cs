@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour {
     private Vector3 moveDirection;
     private bool groundedPlayer;
     private float currentSpeed;
+    public bool IsRunning() => currentSpeed > walkSpeed + 0.2f;
 
     private void Awake() {
 
