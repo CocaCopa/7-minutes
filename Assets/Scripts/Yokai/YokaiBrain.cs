@@ -1,18 +1,17 @@
 using UnityEngine;
 
-public class YokaiDecisionMaker : MonoBehaviour {
-
-    [SerializeField] private float chooseActionInSeconds;
+public class YokaiBrain : MonoBehaviour {
 
     private YokaiObserver observer;
+    private int floorIndex;
 
     private void Awake() {
-        
+
         observer = FindObjectOfType<YokaiObserver>();
     }
 
     private void Update() {
         
-        float floorIndex = observer.PlayerFloorIndex();
+        floorIndex = observer.PlayerFloorIndex();
     }
 }

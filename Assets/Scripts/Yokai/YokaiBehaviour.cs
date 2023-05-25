@@ -38,11 +38,13 @@ public class YokaiBehaviour : MonoBehaviour {
 
     }
 
-    public void ChasePlayer(Transform playerTransform) {
+    public void ChasePlayer() {
 
-        navMeshAgent.destination = playerTransform.position;
+        Vector3 playerPosition = YokaiObserver.Instance.GetPlayerTransform().position;
 
-        bool nearPlayer = Vector3.Distance(transform.position, playerTransform.position) < rangeToKillPlayer;
+        navMeshAgent.destination = playerPosition;
+
+        bool nearPlayer = Vector3.Distance(transform.position, playerPosition) < rangeToKillPlayer;
 
         if (nearPlayer) {
 
@@ -79,5 +81,10 @@ public class YokaiBehaviour : MonoBehaviour {
         navMeshAgent.destination = position;
     }
     
+    public void RandomBehaviour() {
+
+
+    }
+
     public float GetCurrentSpeed() => navMeshAgent.velocity.magnitude;
 }

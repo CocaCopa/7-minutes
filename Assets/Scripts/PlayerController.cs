@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float interactDistance = 1.5f;
     [SerializeField] private LayerMask intercatLayer;
+
     private CharacterController controller;
     private PlayerMovement playerMovement;
 

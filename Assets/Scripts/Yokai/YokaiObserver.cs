@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class YokaiObserver : MonoBehaviour {
 
+    public static YokaiObserver Instance { get; private set; }
+
     public event EventHandler OnRunEventWarning;
     public event EventHandler OnRunEventChase;
 
@@ -23,8 +25,11 @@ public class YokaiObserver : MonoBehaviour {
     private float playerRunningTimer = 0;
     private float yokaiChaseTimer = 0;
 
+    public Transform GetPlayerTransform() => playerTransform;
+
     private void Awake() {
 
+        Instance = this;
         playerMovement = FindObjectOfType<PlayerMovement>();
         playerTransform = playerMovement.gameObject.transform;
     }
@@ -35,6 +40,13 @@ public class YokaiObserver : MonoBehaviour {
 
             door.GetComponent<Door>().OnDoorOpen += PlayerObserver_OnDoorOpen;
         }
+
+        playerMovement.OnRoomEnter += PlayerMovement_OnRoomEnter;
+    }
+
+    private void PlayerMovement_OnRoomEnter(object sender, PlayerMovement.OnRoomEnterEventArgs e) {
+
+        Debug.Log("Player entered: " + e.room.name + " at floor: " + PlayerFloorIndex());
     }
 
     private void Update() {

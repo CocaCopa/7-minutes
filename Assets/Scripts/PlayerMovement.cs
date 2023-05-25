@@ -1,7 +1,15 @@
+using System;
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
+//[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour {
+
+    public event EventHandler<OnRoomEnterEventArgs> OnRoomEnter;
+
+    public class OnRoomEnterEventArgs {
+
+        public GameObject room;
+    }
 
     [SerializeField] LayerMask stairsLayer;
     [SerializeField] private float walkSpeed = 2.0f;
@@ -11,6 +19,7 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField] private float gravityValue = -9.81f;
 
     private CharacterController controller;
+    private Rigidbody playerRb;
     private Transform cameraTransform;
     private Vector3 playerVelocity;
     private Vector3 moveDirection;
@@ -95,5 +104,21 @@ public class PlayerMovement : MonoBehaviour {
         bool facingUp = Vector3.Dot(Camera.main.transform.forward, Vector3.down) < 0;
 
         return onStairs && movingForward && facingUp;
+    }
+
+    GameObject previousRoom;
+    private void OnTriggerEnter(Collider other) {
+
+        bool enteredDifferentRoom = other.gameObject != previousRoom;
+
+        if (enteredDifferentRoom) {
+
+            OnRoomEnter?.Invoke(this, new OnRoomEnterEventArgs {
+
+                room = other.gameObject.transform.parent.gameObject
+            });
+        }
+
+        previousRoom = other.gameObject;
     }
 }
