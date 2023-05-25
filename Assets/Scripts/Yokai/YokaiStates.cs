@@ -1,13 +1,11 @@
-using System;
-
-public enum State {
-    GameStart,
-    LibraryEvent,
-    FollowBehindPlayer,
-    WaittingForAction
-}
-
 public static class YokaiStates {
+
+    public enum State {
+        GameStart,
+        LibraryEvent,
+        FollowBehindPlayer,
+        WaittingForAction
+    }
 
     private static State currentState;
 

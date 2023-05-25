@@ -78,6 +78,6 @@ public class YokaiBehaviour : MonoBehaviour {
         navMeshAgent.speed = 3.5f;
         navMeshAgent.destination = position;
     }
-
+    
     public float GetCurrentSpeed() => navMeshAgent.velocity.magnitude;
 }

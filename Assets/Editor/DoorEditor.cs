@@ -13,16 +13,33 @@ public class DoorEditor : Editor {
 
         Door door = (Door)target;
 
-        bool fireEvent = door.GetFireEvent();
-        if (!fireEvent) return;
-
         EditorGUI.BeginChangeCheck();
 
-        Transform assignedTransform = (Transform)EditorGUILayout.ObjectField("Jumpscare Transform", door.GetJumpscareTransform(), typeof(Transform), true);
-        door.SetJumpscarePosition(assignedTransform);
+        FireEvent(door);
+        NeedsKey(door);
 
         if (EditorGUI.EndChangeCheck()) {
             EditorUtility.SetDirty(door);
         }
+    }
+
+    private void NeedsKey(Door door) {
+
+        bool needsKey = door.GetNeedsKey();
+        if (!needsKey)
+            return;
+
+        GameObject assignedObject = (GameObject)EditorGUILayout.ObjectField("Key GameObject", door.GetKeyObject(), typeof(GameObject), true);
+        door.SetKeyObject(assignedObject);
+    }
+
+    private void FireEvent(Door door) {
+
+        bool fireEvent = door.GetFireEvent();
+        if (!fireEvent)
+            return;
+
+        Transform assignedTransform = (Transform)EditorGUILayout.ObjectField("Jumpscare Transform", door.GetJumpscareTransform(), typeof(Transform), true);
+        door.SetJumpscarePosition(assignedTransform);
     }
 }

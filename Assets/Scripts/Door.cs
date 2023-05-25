@@ -10,19 +10,30 @@ public class Door : ItemOpen, IInteracteable {
         public Transform jumpscareTransform;
     }
 
+    [SerializeField] private bool needsKey = false;
+    [HideInInspector]
+    [SerializeField] private GameObject keyObject;
+
     [SerializeField] private bool fireEvent = false;
     [HideInInspector]
     [SerializeField] private Transform jumpscarePosition;
 
+    private PlayerInventory playerInventory;
+
     #region Custom Editor:
+    public bool GetNeedsKey() => needsKey;
+    public GameObject GetKeyObject() => keyObject;
+    public void SetKeyObject(GameObject value) => keyObject = value;
+
     public bool GetFireEvent() => fireEvent;
     public Transform GetJumpscareTransform() => jumpscarePosition;
-    public Transform SetJumpscarePosition(Transform value) => jumpscarePosition = value;
+    public void SetJumpscarePosition(Transform value) => jumpscarePosition = value;
     #endregion
 
     private void Awake() {
 
         defaultPosition = transform.eulerAngles;
+        playerInventory = FindObjectOfType<PlayerInventory>();
         enabled = false;
     }
 
@@ -33,6 +44,10 @@ public class Door : ItemOpen, IInteracteable {
     }
 
     public override void Interact() {
+
+        if (needsKey && !playerInventory.HasItem(keyObject)) {
+            return;
+        }
 
         animationPoints = 0;
         currentPosition = transform.eulerAngles;
