@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class YokaiBrain : MonoBehaviour {
 
     private YokaiObserver observer;
+    private List<Transform> spawnPositions = new();
     private int floorIndex;
 
     private void Awake() {
@@ -14,4 +16,13 @@ public class YokaiBrain : MonoBehaviour {
         
         floorIndex = observer.PlayerFloorIndex();
     }
+
+    public void SetValidSpawnPositions(Transform[] positions) {
+
+        spawnPositions.Clear();
+
+        foreach (var position in positions) {
+
+            spawnPositions.Add(position);
+        }
 }

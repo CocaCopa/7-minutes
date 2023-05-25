@@ -46,7 +46,9 @@ public class YokaiObserver : MonoBehaviour {
 
     private void PlayerMovement_OnRoomEnter(object sender, PlayerMovement.OnRoomEnterEventArgs e) {
 
-        Debug.Log("Player entered: " + e.room.name + " at floor: " + PlayerFloorIndex());
+        GameObject room = e.room;
+
+
     }
 
     private void Update() {
