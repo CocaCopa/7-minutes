@@ -26,8 +26,8 @@ public class PlayerController : MonoBehaviour
         Vector3 rayDirection = Camera.main.transform.forward;
         Ray ray = new (rayOrigin, rayDirection);
 
-
         Physics.Raycast(ray, out RaycastHit hit, interactDistance, intercatLayer);
+        
         if (hit.transform != null && hit.transform.TryGetComponent(out IInteracteable interactable)) {
 
             interactable.Interact();

@@ -14,6 +14,27 @@ public class YokaiController : MonoBehaviour {
         behaviour = FindObjectOfType<YokaiBehaviour>();
     }
 
+    private void Start() {
+
+        Door[] doors = FindObjectsOfType<Door>();
+        foreach (var door in doors) {
+
+            if (door.GetFireEvent()) {
+
+                door.OnDoorOpen += Door_OnDoorOpen;
+            }
+        }
+    }
+
+    private void Door_OnDoorOpen(object sender, Door.OnDoorOpenEventArgs e) {
+
+        if (e.isOpen) {
+
+            behaviour.SpawnAtPosition(e.jumpscareTransform);
+            behaviour.RunTowardsPosition(e.jumpscareTransform.position);
+        }
+    }
+
     private void Update() {
 
         if (ChooseNextAction()) {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class YokaiObserver : MonoBehaviour {
@@ -20,6 +21,7 @@ public class YokaiObserver : MonoBehaviour {
 
     private Transform playerTransform;
     private PlayerMovement playerMovement;
+    private YokaiBrain brain;
     private bool canFireOnRunEvent = true;
     private bool canFireOnChaseEvent = true;
     private float playerRunningTimer = 0;
@@ -31,6 +33,7 @@ public class YokaiObserver : MonoBehaviour {
 
         Instance = this;
         playerMovement = FindObjectOfType<PlayerMovement>();
+        brain = FindObjectOfType<YokaiBrain>();
         playerTransform = playerMovement.gameObject.transform;
     }
 
@@ -46,9 +49,21 @@ public class YokaiObserver : MonoBehaviour {
 
     private void PlayerMovement_OnRoomEnter(object sender, PlayerMovement.OnRoomEnterEventArgs e) {
 
-        GameObject room = e.room;
+        Transform spawnPositionsHolder = e.room.transform.GetChild(0);
 
+        if (spawnPositionsHolder.name != "YokaiSpawnPositions") {
+            brain.SetValidSpawnPositions(null);
+            return;
+        }
 
+        List<Transform> validSpawns = new();
+        for (int i = 0; i < spawnPositionsHolder.childCount; i++) {
+
+            validSpawns.Add(spawnPositionsHolder.GetChild(i));
+        }
+
+        brain.SetValidSpawnPositions(validSpawns);
+        
     }
 
     private void Update() {
@@ -90,17 +105,6 @@ public class YokaiObserver : MonoBehaviour {
 
         return false;
     }
-
-    /*private void StartTimer(float timer, float maxTime, out bool canFireEvent) {
-
-        canFireEvent = false;
-        timer += Time.deltaTime;
-
-        if (timer >= maxTime) {
-
-            canFireEvent = true;
-        }
-    }*/
 
     private void ChasePlayerIfRunning() {
 

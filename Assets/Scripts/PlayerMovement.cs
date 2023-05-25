@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-//[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour {
 
     public event EventHandler<OnRoomEnterEventArgs> OnRoomEnter;

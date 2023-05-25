@@ -17,12 +17,16 @@ public class YokaiBrain : MonoBehaviour {
         floorIndex = observer.PlayerFloorIndex();
     }
 
-    public void SetValidSpawnPositions(Transform[] positions) {
+    public void SetValidSpawnPositions(List<Transform> positions) {
 
         spawnPositions.Clear();
-
-        foreach (var position in positions) {
-
-            spawnPositions.Add(position);
+        if (positions != null) {
+            spawnPositions = positions;
         }
+    }
+
+    public List<Transform> GetValidSpawnPositions() {
+
+        return spawnPositions;
+    }
 }
