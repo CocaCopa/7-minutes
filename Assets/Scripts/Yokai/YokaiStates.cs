@@ -1,20 +1,22 @@
 using System;
 
-public enum Yokai_State {
+public enum State {
+    GameStart,
     LibraryEvent,
+    FollowBehindPlayer,
+    WaittingForAction
 }
 
-[Serializable]
-public class YokaiStates {
+public static class YokaiStates {
 
-    private static Yokai_State currentState;
+    private static State currentState;
 
-    public static Yokai_State GetYokaiState() {
+    public static State GetYokaiState() {
 
         return currentState;
     }
 
-    public static void SetYokaiState(Yokai_State state) {
+    public static void SetYokaiState(State state) {
 
         currentState = state;
     }

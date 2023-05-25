@@ -9,11 +9,17 @@ public class YokaiBehaviour : MonoBehaviour {
 
     [Space(10)]
 
+    [Header("--- Movement ---")]
     [SerializeField] private float rangeToKillPlayer;
     [SerializeField] private float walkSpeed;
     [SerializeField] private float runSpeed;
 
+    [Header("--- Items ---")]
+    [SerializeField] private GameObject[] equipableItems;
+    [SerializeField] private float throwForce;
+
     private NavMeshAgent navMeshAgent;
+    private GameObject equippedItem;
 
     private void Awake() {
 
@@ -42,6 +48,23 @@ public class YokaiBehaviour : MonoBehaviour {
 
             KillPlayer();
         }
+    }
+
+    public void EquipItem() {
+
+        int randomIndex = Random.Range(0, equipableItems.Length);
+        GameObject randomItem = equipableItems[randomIndex];
+        Rigidbody rb = randomItem.AddComponent<Rigidbody>();
+        rb.isKinematic = true;
+
+        equippedItem = randomItem;
+    }
+
+    public void ThrowItem(Vector3 direction) {
+
+        Rigidbody rb = equippedItem.GetComponent<Rigidbody>();
+        rb.isKinematic = false;
+        rb.AddForce(direction * throwForce, ForceMode.Impulse);
     }
 
     public void KillPlayer() {
