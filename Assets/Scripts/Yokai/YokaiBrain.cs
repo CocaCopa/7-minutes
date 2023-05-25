@@ -13,9 +13,10 @@ public class YokaiBrain : MonoBehaviour {
     }
 
     private void Update() {
-        
+
         floorIndex = observer.PlayerFloorIndex();
     }
+
 
     public void SetValidSpawnPositions(List<Transform> positions) {
 

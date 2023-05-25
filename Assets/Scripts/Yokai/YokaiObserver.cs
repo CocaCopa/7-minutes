@@ -39,31 +39,7 @@ public class YokaiObserver : MonoBehaviour {
 
     private void Start() {
 
-        foreach (var door in jumpscareDoorsTransform) {
-
-            door.GetComponent<Door>().OnDoorOpen += PlayerObserver_OnDoorOpen;
-        }
-
         playerMovement.OnRoomEnter += PlayerMovement_OnRoomEnter;
-    }
-
-    private void PlayerMovement_OnRoomEnter(object sender, PlayerMovement.OnRoomEnterEventArgs e) {
-
-        Transform spawnPositionsHolder = e.room.transform.GetChild(0);
-
-        if (spawnPositionsHolder.name != "YokaiSpawnPositions") {
-            brain.SetValidSpawnPositions(null);
-            return;
-        }
-
-        List<Transform> validSpawns = new();
-        for (int i = 0; i < spawnPositionsHolder.childCount; i++) {
-
-            validSpawns.Add(spawnPositionsHolder.GetChild(i));
-        }
-
-        brain.SetValidSpawnPositions(validSpawns);
-        
     }
 
     private void Update() {
@@ -71,11 +47,27 @@ public class YokaiObserver : MonoBehaviour {
         ChasePlayerIfRunning();
     }
 
-    private void PlayerObserver_OnDoorOpen(object sender, Door.OnDoorOpenEventArgs e) {
+    private void PlayerMovement_OnRoomEnter(object sender, PlayerMovement.OnRoomEnterEventArgs e) {
 
-        // -Observer knows that one of the doors opened
-        // -Event arguments will tell it which door it is and which position should be
-        // used to spawn the Yokai
+        GameObject spawnsHolder = GameObject.Find(e.room.name + "_Spawns");
+
+        if (spawnsHolder) {
+
+            List<Transform> validSpawns = new();
+
+            for (int i = 0; i < spawnsHolder.transform.childCount; i++) {
+
+                validSpawns.Add(spawnsHolder.transform.GetChild(i));
+            }
+
+            brain.SetValidSpawnPositions(validSpawns);
+        }
+        else {
+
+            brain.SetValidSpawnPositions(null);
+        }
+
+        
     }
 
     private bool PlayerIsRunningForTooLong() {
@@ -151,6 +143,7 @@ public class YokaiObserver : MonoBehaviour {
             return 3;
 
         // Game bugged
+        Debug.LogWarning("YokaiObserver: Is your character flying? :O");
         return -100;
     }
 }

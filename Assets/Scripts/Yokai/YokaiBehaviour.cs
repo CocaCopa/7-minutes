@@ -7,17 +7,6 @@ public class YokaiBehaviour : MonoBehaviour {
 
     [SerializeField] private GameObject yokaiVisuals;
 
-    [Space(10)]
-
-    [Header("--- Movement ---")]
-    [SerializeField] private float rangeToKillPlayer;
-    [SerializeField] private float walkSpeed;
-    [SerializeField] private float runSpeed;
-
-    [Header("--- Items ---")]
-    [SerializeField] private GameObject[] equipableItems;
-    [SerializeField] private float throwForce;
-
     private NavMeshAgent navMeshAgent;
     private GameObject equippedItem;
 
@@ -35,16 +24,16 @@ public class YokaiBehaviour : MonoBehaviour {
 
     public void DisableCharacter() {
 
-
+        
     }
 
-    public void ChasePlayer() {
+    public void ChasePlayer(float rangeToKill) {
 
         Vector3 playerPosition = YokaiObserver.Instance.GetPlayerTransform().position;
 
         navMeshAgent.destination = playerPosition;
 
-        bool nearPlayer = Vector3.Distance(transform.position, playerPosition) < rangeToKillPlayer;
+        bool nearPlayer = Vector3.Distance(transform.position, playerPosition) < rangeToKill;
 
         if (nearPlayer) {
 
@@ -52,9 +41,9 @@ public class YokaiBehaviour : MonoBehaviour {
         }
     }
 
-    public void EquipItem() {
+    public void EquipItem(List<GameObject> equipableItems) {
 
-        int randomIndex = Random.Range(0, equipableItems.Length);
+        int randomIndex = Random.Range(0, equipableItems.Count);
         GameObject randomItem = equipableItems[randomIndex];
         Rigidbody rb = randomItem.AddComponent<Rigidbody>();
         rb.isKinematic = true;
@@ -62,7 +51,7 @@ public class YokaiBehaviour : MonoBehaviour {
         equippedItem = randomItem;
     }
 
-    public void ThrowItem(Vector3 direction) {
+    public void ThrowItem(Vector3 direction, float throwForce) {
 
         Rigidbody rb = equippedItem.GetComponent<Rigidbody>();
         rb.isKinematic = false;
