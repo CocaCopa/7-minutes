@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class ItemOpen : MonoBehaviour, IInteracteable {
@@ -17,4 +15,5 @@ public abstract class ItemOpen : MonoBehaviour, IInteracteable {
     public abstract void Interact();
 
     protected bool DisableUpdateMethod() => animationPoints <= 1;
+    public bool GetIsOpen() => isOpen;
 }

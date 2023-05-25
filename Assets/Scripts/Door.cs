@@ -1,8 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
+[System.Serializable]
 public class Door : ItemOpen, IInteracteable {
+
+    public event EventHandler<OnDoorOpenEventArgs> OnDoorOpen;
+    public class OnDoorOpenEventArgs {
+        public bool isOpen;
+        public Transform jumpscareTransform;
+    }
+
+    [SerializeField] private bool fireEvent = false;
+    [HideInInspector]
+    [SerializeField] private Transform jumpscarePosition;
+
+    #region Custom Editor:
+    public bool GetFireEvent() => fireEvent;
+    public Transform GetJumpscareTransform() => jumpscarePosition;
+    public Transform SetJumpscarePosition(Transform value) => jumpscarePosition = value;
+    #endregion
 
     private void Awake() {
 
@@ -23,6 +39,14 @@ public class Door : ItemOpen, IInteracteable {
         targetPosition = isOpen ? defaultPosition : NewRotation();
 
         isOpen = !isOpen;
+
+        if (fireEvent) {
+            OnDoorOpen?.Invoke(this, new OnDoorOpenEventArgs {
+                isOpen = isOpen,
+                jumpscareTransform = jumpscarePosition
+            });
+        }
+
         enabled = true;
     }
 
