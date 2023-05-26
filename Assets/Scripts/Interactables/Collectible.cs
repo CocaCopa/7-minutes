@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Collectible : MonoBehaviour, IInteracteable {
+public class Collectible : MonoBehaviour, IInteractable {
     
     public void Interact() {
 

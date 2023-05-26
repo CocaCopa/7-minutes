@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Drawer : ItemOpen, IInteracteable {
+public class Drawer : ItemOpen, IInteractable {
 
     private void Awake() {
 

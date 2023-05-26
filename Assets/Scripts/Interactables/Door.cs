@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [System.Serializable]
-public class Door : ItemOpen, IInteracteable {
+public class Door : ItemOpen, IInteractable {
 
     public event EventHandler<OnDoorOpenEventArgs> OnDoorOpen;
     public class OnDoorOpenEventArgs {

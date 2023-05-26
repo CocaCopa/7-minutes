@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class ItemOpen : MonoBehaviour, IInteracteable {
+public abstract class ItemOpen : MonoBehaviour, IInteractable {
 
     [SerializeField] protected float openSpeed = 3.5f;
     [SerializeField] protected Vector3 offsetAmount = new(0, 60, 0);

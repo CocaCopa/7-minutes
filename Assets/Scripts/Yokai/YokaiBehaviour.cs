@@ -6,6 +6,7 @@ using UnityEngine.AI;
 public class YokaiBehaviour : MonoBehaviour {
 
     [SerializeField] private GameObject yokaiVisuals;
+    [SerializeField] private List<GameObject> interactables;
 
     private NavMeshAgent navMeshAgent;
     private GameObject equippedItem;
@@ -70,6 +71,19 @@ public class YokaiBehaviour : MonoBehaviour {
         rb.AddForce(direction * throwForce, ForceMode.Impulse);
     }
 
+    public void OpenRandomDoor() {
+
+        int randomIndex = Random.Range(0, interactables.Count);
+
+        interactables[randomIndex].GetComponent<IInteractable>().Interact();
+    }
+
+    private void Update() {
+        
+        if (Input.GetKeyDown(KeyCode.Q)) {
+            OpenRandomDoor();
+        }
+    }
     public void KillPlayer() {
 
 

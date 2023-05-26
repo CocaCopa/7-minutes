@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
 
         Physics.Raycast(ray, out RaycastHit hit, interactDistance, intercatLayer);
         
-        if (hit.transform != null && hit.transform.TryGetComponent(out IInteracteable interactable)) {
+        if (hit.transform != null && hit.transform.TryGetComponent(out IInteractable interactable)) {
 
             interactable.Interact();
         }
