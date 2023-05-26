@@ -80,9 +80,9 @@ public class YokaiObserver : MonoBehaviour {
 
             brain.SetValidSpawnPositions(null);
         }
+
+        //Debug.Log("Floor: " + PlayerFloorIndex() + " -- Room: " + e.currentRoom.name);
     }
-
-
 
     private bool PlayerRun_WarningEvent() {
 
