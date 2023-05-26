@@ -35,7 +35,7 @@ public class YokaiBehaviour : MonoBehaviour {
         yokaiVisuals.SetActive(false);
     }
 
-    public void ChasePlayer(float rangeToKill) {
+    public void ChasePlayer() {
 
         if (!navMeshAgent.enabled) {
             return;
@@ -45,13 +45,6 @@ public class YokaiBehaviour : MonoBehaviour {
         navMeshAgent.acceleration = 8;
         navMeshAgent.speed = 4f;
         navMeshAgent.destination = playerPosition;
-
-        bool nearPlayer = Vector3.Distance(transform.position, playerPosition) < rangeToKill;
-
-        if (nearPlayer) {
-
-            KillPlayer();
-        }
     }
 
     public void EquipItem(List<GameObject> equipableItems) {

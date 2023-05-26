@@ -35,6 +35,8 @@ public class YokaiController : MonoBehaviour {
 
     private YokaiBehaviour behaviour;
     private GameObject roomYokaiIsIn;
+    private Transform yokaiTransform;
+    private Transform playerTransform;
     private float chaseTimer = 0;
     private float sameRoomChaseTimer = 0;
     private float despawnFromRoomTimer = 0;
@@ -47,10 +49,12 @@ public class YokaiController : MonoBehaviour {
     private void Awake() {
 
         behaviour = FindObjectOfType<YokaiBehaviour>();
+        yokaiTransform = behaviour.transform;
     }
 
     private void Start() {
 
+        playerTransform = YokaiObserver.Instance.GetPlayerTransform();
         Door[] doors = FindObjectsOfType<Door>();
         
         foreach (var door in doors) {
@@ -69,6 +73,13 @@ public class YokaiController : MonoBehaviour {
             ChasePlayerAction();
             SpawnedInRoomAction();
         }
+
+        bool nearPlayer = Vector3.Distance(transform.position, playerTransform.position) < rangeToKillPlayer;
+
+        if (nearPlayer) {
+
+            behaviour.KillPlayer();
+        }
     }
 
     private void ChasePlayerAction() {
@@ -77,7 +88,7 @@ public class YokaiController : MonoBehaviour {
 
             isChasing = true;
             chaseTimer += Time.deltaTime;
-            behaviour.ChasePlayer(rangeToKillPlayer);
+            behaviour.ChasePlayer();
 
             if (chaseTimer > chaseTime) {
 
