@@ -8,7 +8,8 @@ public class PlayerMovement : MonoBehaviour {
 
     public class OnRoomEnterEventArgs {
 
-        public GameObject room;
+        public GameObject currentRoom;
+        public GameObject previousRoom;
     }
 
     [SerializeField] LayerMask stairsLayer;
@@ -19,7 +20,6 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField] private float gravityValue = -9.81f;
 
     private CharacterController controller;
-    private Rigidbody playerRb;
     private Transform cameraTransform;
     private Vector3 playerVelocity;
     private Vector3 moveDirection;
@@ -115,7 +115,8 @@ public class PlayerMovement : MonoBehaviour {
 
             OnRoomEnter?.Invoke(this, new OnRoomEnterEventArgs {
 
-                room = other.gameObject.transform.parent.gameObject
+                currentRoom = other.gameObject.transform.parent.gameObject,
+                previousRoom = previousRoom
             });
         }
 

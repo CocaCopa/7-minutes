@@ -6,9 +6,13 @@ public class YokaiObserver : MonoBehaviour {
 
     public static YokaiObserver Instance { get; private set; }
 
+    public class OnValidRoomEnterEventArgs { 
+        public GameObject room;
+    }
+
     public event EventHandler OnRunEventWarning;
     public event EventHandler OnRunEventChase;
-    public event EventHandler OnValidRoomEnter;
+    public event EventHandler<OnValidRoomEnterEventArgs> OnValidRoomEnter;
 
     [Header("--- Library Event ---")]
     [SerializeField] private Transform[] jumpscareDoorsTransform;
@@ -24,12 +28,15 @@ public class YokaiObserver : MonoBehaviour {
     private PlayerMovement playerMovement;
     private YokaiBrain brain;
     private YokaiController controller;
+
+    private GameObject roomPlayerIsIn;
     private bool canFireOnRunEvent = true;
     private bool canFireOnChaseEvent = true;
     private float playerRunningTimer = 0;
     private float yokaiChaseTimer = 0;
 
     public Transform GetPlayerTransform() => playerTransform;
+    public GameObject GetRoomPlayerIsIn() => roomPlayerIsIn;
 
     private void Awake() {
 
@@ -52,7 +59,8 @@ public class YokaiObserver : MonoBehaviour {
 
     private void PlayerMovement_OnRoomEnter(object sender, PlayerMovement.OnRoomEnterEventArgs e) {
 
-        GameObject spawnsHolder = GameObject.Find(e.room.name + "_Spawns");
+        roomPlayerIsIn = e.currentRoom;
+        GameObject spawnsHolder = GameObject.Find(e.currentRoom.name + "_Spawns");
 
         if (spawnsHolder) {
 
@@ -64,13 +72,17 @@ public class YokaiObserver : MonoBehaviour {
             }
 
             brain.SetValidSpawnPositions(validSpawns);
-            OnValidRoomEnter?.Invoke(this, EventArgs.Empty);
+            OnValidRoomEnter?.Invoke(this, new OnValidRoomEnterEventArgs {
+                room = e.currentRoom
+            });
         }
         else {
 
             brain.SetValidSpawnPositions(null);
         }
     }
+
+
 
     private bool PlayerRun_WarningEvent() {
 

@@ -15,16 +15,25 @@ public class YokaiController : MonoBehaviour {
     [SerializeField] private float throwForce;
 
     [Header("--- Chase ---")]
+    [Tooltip("The minimum distance from player the Yokai can spawn")]
     [SerializeField] private float chaseMinSpawnDistance;
+    [Tooltip("For how long should the Yokai chase before it despawns")]
     [SerializeField] private float chaseTime;
+    [Tooltip("How long is the player allowed to stay in the same room as the Yokai, before the Yokai starts chasing him")]
+    [SerializeField] private float sameRoomChaseTime;
+    [Tooltip("How long should the Yokai stay in the room it spawned, when the player has left the room")]
+    [SerializeField] private float despawnFromRoomTime;
 
     [Header("--- Chance To Spawn On Room Enter ---")]
-    [SerializeField] private int chanceToSpawn;
+    [SerializeField, Range(0, 100)] private int chanceToSpawn;
     [SerializeField] private List<Transform> spawnsFloor_1;
     [SerializeField] private List<Transform> spawnsFloor_2;
 
     private YokaiBehaviour behaviour;
+    private GameObject roomYokaiIsIn;
     private float chaseTimer = 0;
+    private float sameRoomChaseTimer = 0;
+    private float despawnFromRoomTimer = 0;
     private bool chasePlayer = false;
     private bool isChasing = false;
     public bool GetIsChasing() => isChasing;
@@ -48,32 +57,73 @@ public class YokaiController : MonoBehaviour {
         YokaiObserver.Instance.OnValidRoomEnter += Observer_OnValidRoomEnter;
     }
 
-    private void Observer_OnValidRoomEnter(object sender, System.EventArgs e) {
+    private void Update() {
 
-        if (behaviour.IsActing()) {
+        if (chasePlayer) {
+
+            isChasing = true;
+            chaseTimer += Time.deltaTime;
+            behaviour.ChasePlayer(rangeToKillPlayer);
+
+            if (chaseTimer > chaseTime) {
+
+                chasePlayer = false;
+                isChasing = false;
+                chaseTimer = 0;
+
+                behaviour.DespawnCharacter();
+            }
+        }
+
+        if (!isChasing) {
+
+            if (YokaiObserver.Instance.GetRoomPlayerIsIn() == roomYokaiIsIn) {
+
+                sameRoomChaseTimer += Time.deltaTime;
+                despawnFromRoomTimer = 0;
+
+                if (sameRoomChaseTimer >= sameRoomChaseTime) {
+
+                    roomYokaiIsIn = null;
+                    sameRoomChaseTimer = 0;
+                    chasePlayer = true;
+                }
+            }
+            else if (YokaiObserver.Instance.GetRoomPlayerIsIn() != roomYokaiIsIn && roomYokaiIsIn != null) {
+
+                despawnFromRoomTimer += Time.deltaTime;
+                sameRoomChaseTimer = 0;
+
+                if (despawnFromRoomTimer >= despawnFromRoomTime) {
+
+                    roomYokaiIsIn = null;
+                    despawnFromRoomTimer = 0;
+                    behaviour.DespawnCharacter();
+                }
+            }
+        }
+    }
+
+    private void Observer_OnValidRoomEnter(object sender, YokaiObserver.OnValidRoomEnterEventArgs e) {
+
+        if (isChasing || behaviour.IsActing()) {
             return;
         }
 
         int randomNumber = Random.Range(0, 101);
 
         if (randomNumber >= 0 && randomNumber <= chanceToSpawn) {
-                
-            behaviour.DespawnCharacter();
+
+            behaviour.DespawnCharacter(); // For safery, make sure that the character is not in then scene before calling SpawnAtPosition()
+            roomYokaiIsIn = e.room;
             List<Transform> validSpawns = YokaiBrain.GetValidSpawnPositions();
-
-            if (validSpawns.Count != 0) {
-
-                int randomIndex = Random.Range(0, validSpawns.Count);
-
-                behaviour.SpawnAtPosition(validSpawns[randomIndex]);
-                Invoke(nameof(Temp), 5);
-            }
+            int randomIndex = Random.Range(0, validSpawns.Count);
+            behaviour.SpawnAtPosition(validSpawns[randomIndex]);
         }
     }
 
     private void Observer_OnRunEventChase(object sender, System.EventArgs e) {
 
-        isChasing = true;
         int floorIndex = YokaiObserver.Instance.PlayerFloorIndex();
         Transform playerTransform = YokaiObserver.Instance.GetPlayerTransform();
         Vector3 playerPosition = playerTransform.position;
@@ -102,29 +152,6 @@ public class YokaiController : MonoBehaviour {
 
         behaviour.SpawnAtPosition(spawnPosition);
         chasePlayer = true;
-    }
-
-    private void Update() {
-
-        if (chasePlayer) {
-
-            behaviour.ChasePlayer(rangeToKillPlayer);
-            chaseTimer += Time.deltaTime;
-
-            if (chaseTimer > chaseTime) {
-
-                chasePlayer = false;
-                isChasing = false;
-                chaseTimer = 0;
-
-                behaviour.DespawnCharacter();
-            }
-        }
-    }
-
-    private void Temp() {
-
-        behaviour.DespawnCharacter();
     }
 
     private void Door_OnDoorOpen(object sender, Door.OnDoorOpenEventArgs e) {

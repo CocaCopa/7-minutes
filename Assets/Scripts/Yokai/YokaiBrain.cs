@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -59,7 +58,7 @@ public class YokaiBrain : MonoBehaviour {
             }
         }
 
-        // If no preferable spawn point found, return:
-        return spawns[^3];
+        // If no preferable spawn point found, return a random spawn point:
+        return spawns[Random.Range(0,spawns.Count)];
     }
 }
