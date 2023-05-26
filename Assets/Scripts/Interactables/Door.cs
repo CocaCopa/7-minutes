@@ -87,11 +87,11 @@ public class Door : ItemOpen, IInteracteable {
     private Vector3 NewRotation() {
 
         // Open away from player
-        if (DotProduct() > 0) { // same direction
+        if (DotProduct() > 0) { // both look at the same direction
 
             return defaultPosition + offsetAmount;
         }
-        else {  // opposite direction
+        else {  // both look at the opposite direction
 
             return defaultPosition - offsetAmount;
         }

@@ -193,6 +193,13 @@ public class YokaiController : MonoBehaviour {
             foreach (var door in jumpscareDoors) {
                 door.SetFireEvent(false);
             }
+
+            Invoke(nameof(Disappear), 4);
         }
+    }
+
+    private void Disappear() {
+
+        behaviour.DespawnCharacter();
     }
 }
