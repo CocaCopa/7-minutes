@@ -77,7 +77,10 @@ public class YokaiController : MonoBehaviour {
 
         if (!isChasing) {
 
-            if (YokaiObserver.Instance.GetRoomPlayerIsIn() == roomYokaiIsIn) {
+            bool playerInTheSameRoom = YokaiObserver.Instance.GetRoomPlayerIsIn() == roomYokaiIsIn;
+            bool playerLeftTheRoom = roomYokaiIsIn != null && YokaiObserver.Instance.GetRoomPlayerIsIn() != roomYokaiIsIn;
+
+            if (playerInTheSameRoom) {
 
                 sameRoomChaseTimer += Time.deltaTime;
                 despawnFromRoomTimer = 0;
@@ -89,7 +92,7 @@ public class YokaiController : MonoBehaviour {
                     chasePlayer = true;
                 }
             }
-            else if (YokaiObserver.Instance.GetRoomPlayerIsIn() != roomYokaiIsIn && roomYokaiIsIn != null) {
+            else if (playerLeftTheRoom) {
 
                 despawnFromRoomTimer += Time.deltaTime;
                 sameRoomChaseTimer = 0;
