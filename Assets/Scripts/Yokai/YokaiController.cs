@@ -1,8 +1,11 @@
-using System.Linq;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class YokaiController : MonoBehaviour {
+
+    public event EventHandler OnYokaiSpawn;
+    public event EventHandler OnYokaiDespawn;
 
     #region Variables:
     [Header("--- Movement ---")]
@@ -31,6 +34,7 @@ public class YokaiController : MonoBehaviour {
 
     private YokaiBehaviour behaviour;
     private GameObject roomYokaiIsIn;
+    private Door[] jumpscareDoors = new Door[2];
     private float chaseTimer = 0;
     private float sameRoomChaseTimer = 0;
     private float despawnFromRoomTimer = 0;
@@ -47,10 +51,12 @@ public class YokaiController : MonoBehaviour {
     private void Start() {
 
         Door[] doors = FindObjectsOfType<Door>();
-
+        int i = 0;
         foreach (var door in doors) {
             if (door.GetFireEvent()) {
                 door.OnDoorOpen += Door_OnDoorOpen;
+                jumpscareDoors[i] = door;
+                i++;
             }
         }
         YokaiObserver.Instance.OnRunEventChase += Observer_OnRunEventChase;
@@ -58,6 +64,12 @@ public class YokaiController : MonoBehaviour {
     }
 
     private void Update() {
+
+        ChasePlayerAction();
+        SpawnedInRoomAction();
+    }
+
+    private void ChasePlayerAction() {
 
         if (chasePlayer) {
 
@@ -72,8 +84,12 @@ public class YokaiController : MonoBehaviour {
                 chaseTimer = 0;
 
                 behaviour.DespawnCharacter();
+                OnYokaiDespawn?.Invoke(this, EventArgs.Empty);
             }
         }
+    }
+
+    private void SpawnedInRoomAction() {
 
         if (!isChasing) {
 
@@ -102,8 +118,14 @@ public class YokaiController : MonoBehaviour {
                     roomYokaiIsIn = null;
                     despawnFromRoomTimer = 0;
                     behaviour.DespawnCharacter();
+                    OnYokaiDespawn?.Invoke(this, EventArgs.Empty);
                 }
             }
+        }
+        else {
+            roomYokaiIsIn = null;
+            despawnFromRoomTimer = 0;
+            sameRoomChaseTimer = 0;
         }
     }
 
@@ -113,15 +135,16 @@ public class YokaiController : MonoBehaviour {
             return;
         }
 
-        int randomNumber = Random.Range(0, 101);
+        int randomNumber = UnityEngine.Random.Range(0, 101);
 
         if (randomNumber >= 0 && randomNumber <= chanceToSpawn) {
 
             behaviour.DespawnCharacter(); // For safery, make sure that the character is not in then scene before calling SpawnAtPosition()
             roomYokaiIsIn = e.room;
             List<Transform> validSpawns = YokaiBrain.GetValidSpawnPositions();
-            int randomIndex = Random.Range(0, validSpawns.Count);
+            int randomIndex = UnityEngine.Random.Range(0, validSpawns.Count);
             behaviour.SpawnAtPosition(validSpawns[randomIndex]);
+            OnYokaiSpawn?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -154,6 +177,7 @@ public class YokaiController : MonoBehaviour {
         spawnPosition = YokaiBrain.SelectPosition(spawns, chaseMinSpawnDistance, playerPosition);
 
         behaviour.SpawnAtPosition(spawnPosition);
+        OnYokaiSpawn?.Invoke(this, EventArgs.Empty);
         chasePlayer = true;
     }
 
@@ -163,6 +187,12 @@ public class YokaiController : MonoBehaviour {
 
             behaviour.SpawnAtPosition(e.jumpscareTransform);
             behaviour.RunTowardsPosition(e.jumpscareTransform.position);
+
+            OnYokaiSpawn?.Invoke(this, EventArgs.Empty);
+
+            foreach (var door in jumpscareDoors) {
+                door.SetFireEvent(false);
+            }
         }
     }
 }

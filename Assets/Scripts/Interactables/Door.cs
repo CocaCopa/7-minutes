@@ -19,6 +19,7 @@ public class Door : ItemOpen, IInteracteable {
     [SerializeField] private Transform jumpscarePosition;
 
     private PlayerInventory playerInventory;
+    public void SetFireEvent(bool value) => fireEvent = value;
 
     #region Custom Editor:
     public bool GetNeedsKey() => needsKey;
