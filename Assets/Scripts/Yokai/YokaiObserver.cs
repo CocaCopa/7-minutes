@@ -8,6 +8,7 @@ public class YokaiObserver : MonoBehaviour {
 
     public event EventHandler OnRunEventWarning;
     public event EventHandler OnRunEventChase;
+    public event EventHandler OnValidRoomEnter;
 
     [Header("--- Library Event ---")]
     [SerializeField] private Transform[] jumpscareDoorsTransform;
@@ -22,6 +23,7 @@ public class YokaiObserver : MonoBehaviour {
     private Transform playerTransform;
     private PlayerMovement playerMovement;
     private YokaiBrain brain;
+    private YokaiController controller;
     private bool canFireOnRunEvent = true;
     private bool canFireOnChaseEvent = true;
     private float playerRunningTimer = 0;
@@ -34,6 +36,7 @@ public class YokaiObserver : MonoBehaviour {
         Instance = this;
         playerMovement = FindObjectOfType<PlayerMovement>();
         brain = FindObjectOfType<YokaiBrain>();
+        controller = FindObjectOfType<YokaiController>();
         playerTransform = playerMovement.gameObject.transform;
     }
 
@@ -44,7 +47,7 @@ public class YokaiObserver : MonoBehaviour {
 
     private void Update() {
 
-        ChasePlayerIfRunning();
+        PlayerRun_ChaseEvent();
     }
 
     private void PlayerMovement_OnRoomEnter(object sender, PlayerMovement.OnRoomEnterEventArgs e) {
@@ -61,20 +64,20 @@ public class YokaiObserver : MonoBehaviour {
             }
 
             brain.SetValidSpawnPositions(validSpawns);
+            OnValidRoomEnter?.Invoke(this, EventArgs.Empty);
         }
         else {
 
             brain.SetValidSpawnPositions(null);
         }
-
-        
     }
 
-    private bool PlayerIsRunningForTooLong() {
+    private bool PlayerRun_WarningEvent() {
 
         bool playerIsRunning = playerMovement.IsRunning();
+        bool yokaiIsChasing = controller.GetIsChasing();
 
-        if (playerIsRunning) {
+        if (playerIsRunning && !yokaiIsChasing) {
 
             playerRunningTimer += Time.deltaTime;
 
@@ -98,9 +101,9 @@ public class YokaiObserver : MonoBehaviour {
         return false;
     }
 
-    private void ChasePlayerIfRunning() {
+    private void PlayerRun_ChaseEvent() {
 
-        if (PlayerIsRunningForTooLong()) {
+        if (PlayerRun_WarningEvent()) {
 
             yokaiChaseTimer += Time.deltaTime;
 

@@ -15,6 +15,11 @@ public class YokaiBehaviour : MonoBehaviour {
         navMeshAgent = GetComponentInChildren<NavMeshAgent>();
     }
 
+    public bool IsActing() {
+
+        return yokaiVisuals.activeInHierarchy;
+    }
+
     public void SpawnAtPosition(Transform m_transform) {
 
         transform.position = m_transform.position;
@@ -25,14 +30,19 @@ public class YokaiBehaviour : MonoBehaviour {
 
     public void DespawnCharacter() {
 
-        yokaiVisuals.SetActive(false);
         navMeshAgent.enabled = false;
+        yokaiVisuals.SetActive(false);
     }
 
     public void ChasePlayer(float rangeToKill) {
 
-        Vector3 playerPosition = YokaiObserver.Instance.GetPlayerTransform().position;
+        if (!navMeshAgent.enabled) {
+            return;
+        }
 
+        Vector3 playerPosition = YokaiObserver.Instance.GetPlayerTransform().position;
+        navMeshAgent.acceleration = 8;
+        navMeshAgent.speed = 4f;
         navMeshAgent.destination = playerPosition;
 
         bool nearPlayer = Vector3.Distance(transform.position, playerPosition) < rangeToKill;
