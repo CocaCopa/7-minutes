@@ -6,6 +6,7 @@ public class YokaiController : MonoBehaviour {
 
     public event EventHandler OnYokaiSpawn;
     public event EventHandler OnYokaiDespawn;
+    public event EventHandler OnYokaiJumpscare;
 
     #region Variables:
     [Header("--- Movement ---")]
@@ -34,12 +35,12 @@ public class YokaiController : MonoBehaviour {
 
     private YokaiBehaviour behaviour;
     private GameObject roomYokaiIsIn;
-    private Door[] jumpscareDoors = new Door[2];
     private float chaseTimer = 0;
     private float sameRoomChaseTimer = 0;
     private float despawnFromRoomTimer = 0;
     private bool chasePlayer = false;
     private bool isChasing = false;
+    private bool yokaiJumpscare = false;
     public bool GetIsChasing() => isChasing;
     #endregion
 
@@ -51,12 +52,10 @@ public class YokaiController : MonoBehaviour {
     private void Start() {
 
         Door[] doors = FindObjectsOfType<Door>();
-        int i = 0;
+        
         foreach (var door in doors) {
             if (door.GetFireEvent()) {
                 door.OnDoorOpen += Door_OnDoorOpen;
-                jumpscareDoors[i] = door;
-                i++;
             }
         }
         YokaiObserver.Instance.OnRunEventChase += Observer_OnRunEventChase;
@@ -65,8 +64,11 @@ public class YokaiController : MonoBehaviour {
 
     private void Update() {
 
-        ChasePlayerAction();
-        SpawnedInRoomAction();
+        if (!yokaiJumpscare) {
+
+            ChasePlayerAction();
+            SpawnedInRoomAction();
+        }
     }
 
     private void ChasePlayerAction() {
@@ -183,23 +185,36 @@ public class YokaiController : MonoBehaviour {
 
     private void Door_OnDoorOpen(object sender, Door.OnDoorOpenEventArgs e) {
 
+        if (isChasing) {
+            return;
+        }
+        Transform playerTransform = YokaiObserver.Instance.GetPlayerTransform();
+        bool playerInsideRoom = Vector3.Dot(e.jumpscareTransform.forward, playerTransform.forward) > 0;
+
+        if (playerInsideRoom) {
+            return;
+        }
+
         if (e.isOpen) {
 
             behaviour.SpawnAtPosition(e.jumpscareTransform);
             behaviour.RunTowardsPosition(e.jumpscareTransform.position);
 
-            OnYokaiSpawn?.Invoke(this, EventArgs.Empty);
+            OnYokaiJumpscare?.Invoke(this, EventArgs.Empty);
 
-            foreach (var door in jumpscareDoors) {
-                door.SetFireEvent(false);
+            Door[] doors = FindObjectsOfType<Door>();
+            foreach (var door in doors) {
+                door.OnDoorOpen -= Door_OnDoorOpen;
             }
-
+            yokaiJumpscare = true;
             Invoke(nameof(Disappear), 4);
         }
     }
 
     private void Disappear() {
 
+        yokaiJumpscare = false;
         behaviour.DespawnCharacter();
+        OnYokaiDespawn?.Invoke(this, EventArgs.Empty);
     }
 }
