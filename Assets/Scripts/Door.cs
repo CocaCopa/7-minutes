@@ -60,6 +60,7 @@ public class Door : ItemOpen, IInteracteable {
                 isOpen = isOpen,
                 jumpscareTransform = jumpscarePosition
             });
+            fireEvent = false;
         }
 
         enabled = true;

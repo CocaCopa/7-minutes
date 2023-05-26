@@ -21,7 +21,8 @@ public class YokaiController : MonoBehaviour {
     [SerializeField] private float chooseActionInSeconds;
     [SerializeField] private float minTime;
     [SerializeField] private float maxTime;
-    [SerializeField] private List<Transform> allSpawnTransforms;
+    [SerializeField] private List<Transform> spawnsFloor_1;
+    [SerializeField] private List<Transform> spawnsFloor_2;
 
     private YokaiBehaviour behaviour;
     private float chooseActionTimer;
@@ -45,17 +46,33 @@ public class YokaiController : MonoBehaviour {
 
     private void Observer_OnRunEventChase(object sender, System.EventArgs e) {
 
-        Vector3 playerPosition = YokaiObserver.Instance.GetPlayerTransform().position;
+        int floorIndex = YokaiObserver.Instance.PlayerFloorIndex();
+        Debug.Log(floorIndex);
+        Transform playerTransform = YokaiObserver.Instance.GetPlayerTransform();
+        Vector3 playerPosition = playerTransform.position;
         Transform spawnPosition = null;
         int min_idx;
 
-        for (int i = 0; i < allSpawnTransforms.Count - 1; i++) {
+        List<Transform> spawns = new();
+
+        switch (floorIndex) {
+
+            case 1:
+            spawns = spawnsFloor_1;
+            break;
+            case 2:
+            spawns = spawnsFloor_2;
+            break;
+        }
+
+        // Sort list based on distance to the player ...
+        for (int i = 0; i < spawns.Count - 1; i++) {
 
             min_idx = i;
 
-            for (int j = i + 1; j < allSpawnTransforms.Count; j++) {
+            for (int j = i + 1; j < spawns.Count; j++) {
 
-                if (Vector3.Distance(allSpawnTransforms[j].position, playerPosition) < Vector3.Distance(allSpawnTransforms[min_idx].position, playerPosition)) {
+                if (Vector3.Distance(spawns[j].position, playerPosition) < Vector3.Distance(spawns[min_idx].position, playerPosition)) {
 
                     min_idx = j;
                 }
@@ -63,27 +80,33 @@ public class YokaiController : MonoBehaviour {
 
             if (min_idx != i) {
 
-                (allSpawnTransforms[i], allSpawnTransforms[min_idx]) = (allSpawnTransforms[min_idx], allSpawnTransforms[i]);
+                (spawns[i], spawns[min_idx]) = (spawns[min_idx], spawns[i]);
             }
         }
 
-        foreach (var spawnPoint in allSpawnTransforms) {
+        /*for (int i = 0; i < spawns.Count; i++) {
+
+            Debug.Log(Vector3.Distance(spawns[i].position, playerPosition));
+        }*/
+
+        // ... Pick a spawnPoint based on the chaseMinSpawnDistance
+        foreach (var spawnPoint in spawns) {
 
             float distanceFromPlayer = Vector3.Distance(spawnPoint.position, playerPosition);
 
-            if (distanceFromPlayer > chaseMinSpawnDistance) {
+            if (distanceFromPlayer > chaseMinSpawnDistance/* && Vector3.Dot(playerTransform.forward, (playerPosition - spawnPoint.position).normalized) < 0*/) {
 
                 spawnPosition = spawnPoint;
                 break;
             }
             else {
 
-                spawnPosition = allSpawnTransforms[allSpawnTransforms.Count - 3];
+                spawnPosition = spawns[^3];
             }
         }
 
         behaviour.SpawnAtPosition(spawnPosition);
-        behaviour.ChasePlayer(rangeToKillPlayer);
+        //behaviour.ChasePlayer(rangeToKillPlayer);
     }
 
     private void Update() {

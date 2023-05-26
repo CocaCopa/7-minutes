@@ -12,7 +12,7 @@ public class YokaiBehaviour : MonoBehaviour {
 
     private void Awake() {
 
-        navMeshAgent = GetComponent<NavMeshAgent>();
+        navMeshAgent = GetComponentInChildren<NavMeshAgent>();
     }
 
     public void SpawnAtPosition(Transform m_transform) {
@@ -20,11 +20,13 @@ public class YokaiBehaviour : MonoBehaviour {
         transform.position = m_transform.position;
         transform.forward = m_transform.forward;
         yokaiVisuals.SetActive(true);
+        navMeshAgent.enabled = true;
     }
 
-    public void DisableCharacter() {
+    public void DespawnCharacter() {
 
-        
+        yokaiVisuals.SetActive(false);
+        navMeshAgent.enabled = false;
     }
 
     public void ChasePlayer(float rangeToKill) {
