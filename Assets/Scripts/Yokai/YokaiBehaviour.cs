@@ -9,7 +9,8 @@ public class YokaiBehaviour : MonoBehaviour {
     public event EventHandler OnYokaiDespawn;
 
     [SerializeField] private GameObject yokaiVisuals;
-    [SerializeField] private List<GameObject> interactables;
+    [SerializeField] private List<GameObject> doors;
+    [SerializeField] private List<GameObject> throwables;
 
     private NavMeshAgent navMeshAgent;
     private GameObject equippedItem;
@@ -88,18 +89,40 @@ public class YokaiBehaviour : MonoBehaviour {
         equippedItem = randomItem;
     }
 
-    public void ThrowItem(Vector3 direction, float throwForce) {
+    public void ThrowItem() {
 
-        Rigidbody rb = equippedItem.GetComponent<Rigidbody>();
-        rb.isKinematic = false;
-        rb.AddForce(direction * throwForce, ForceMode.Impulse);
+        Vector3 direction = Vector3.zero;
+        int randomDirection = UnityEngine.Random.Range(0, 4);
+
+        switch (randomDirection) {
+
+            case 0:
+            direction = Vector3.up + Vector3.forward;
+            break;
+
+            case 1:
+            direction = Vector3.up + Vector3.right;
+            break;
+
+            case 2:
+            direction = Vector3.up + Vector3.left;
+            break;
+
+            case 3:
+            direction = Vector3.up + Vector3.back;
+            break;
+        }
+
+        int randomItem = UnityEngine.Random.Range(0, throwables.Count);
+        Rigidbody rb = throwables[randomItem].GetComponent<Rigidbody>();
+        rb.AddForce(direction * 30, ForceMode.Impulse);
     }
 
     public void OpenRandomDoor() {
 
-        int randomIndex = UnityEngine.Random.Range(0, interactables.Count);
+        int randomIndex = UnityEngine.Random.Range(0, doors.Count);
 
-        interactables[randomIndex].GetComponent<IInteractable>().Interact();
+        doors[randomIndex].GetComponent<IInteractable>().Interact();
     }
 
     public void KillPlayer() {
@@ -120,7 +143,18 @@ public class YokaiBehaviour : MonoBehaviour {
     
     public void RandomBehaviour() {
 
+        int randomBehaviour = UnityEngine.Random.Range(0, 2);
 
+        switch (randomBehaviour) {
+
+            case 0:
+            OpenRandomDoor();
+            break;
+
+            case 1:
+            ThrowItem();
+            break;
+        }
     }
 
     public float GetCurrentSpeed() => navMeshAgent.velocity.magnitude;

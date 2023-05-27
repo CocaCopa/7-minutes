@@ -5,6 +5,7 @@ using UnityEngine;
 public class YokaiController : MonoBehaviour {
 
     public event EventHandler OnYokaiJumpscare;
+    public event EventHandler OnSpawnBehindPlayer;
 
     #region Variables:
     [Header("--- Movement ---")]
@@ -15,11 +16,7 @@ public class YokaiController : MonoBehaviour {
     [SerializeField] private float acceleration;
 
     [Header("--- Interact with Environment ---")]
-    [SerializeField] private GameObject[] equipableItems;
-    [SerializeField] private float throwForce;
-    [Space(4)]
-    [SerializeField] private GameObject[] doorObjects;
-    [SerializeField] private Vector2 doorInteractTime;
+    [SerializeField] private Vector2 environmentInteractTime;
 
     [Header("--- Chase ---")]
     [Tooltip("The minimum distance from player the Yokai can spawn")]
@@ -32,41 +29,50 @@ public class YokaiController : MonoBehaviour {
     [SerializeField] private float despawnFromRoomTime;
 
     [Header("--- Chance To Spawn On Room Enter ---")]
-    [SerializeField, Range(0, 100)] private int chanceToSpawn;
+    [SerializeField, Range(0, 100)] private int chanceToSpawnOnRoomEnter;
     [SerializeField] private List<Transform> spawnsFloor_1;
     [SerializeField] private List<Transform> spawnsFloor_2;
 
     [Header("--- Basement Event ---")]
     [SerializeField] private Transform sofaSitPosition;
-    [SerializeField] private GameObject dungeonKey;
-    [SerializeField] private GameObject spotLight;
-    [SerializeField] private GameObject pointLight;
+
+    [Header("-- On Door Open Event ---")]
+    [SerializeField] private float timeToDisappearFromDoor;
+
+    [Header("--- Spawn Behind Player ---")]
+    [SerializeField, Range(0, 100)] private float chanceToSpawnBehindPlayer;
+    [Tooltip("Roll the dice to spawn behind player every 'x' seconds")]
+    [SerializeField] private float chanceTime;
+    [SerializeField] private float stopFollowingTime;
 
     private YokaiBehaviour behaviour;
-    private DungeonKeyItem dungeonKeyItem;
     private GameObject roomYokaiIsIn;
     private Transform yokaiTransform;
     private Transform playerTransform;
+
     private bool chasePlayer = false;
+    private bool doorJumpscareEvent = false;
     private bool isChasing = false;
     private bool isSittingInSofa = false;
-    private bool doorJumpscareEvent = false; 
+    private bool isBehindPlayer = false;
     
     private float chaseTimer = 0;
     private float sameRoomChaseTimer = 0;
     private float despawnFromRoomTimer = 0;
-    private float doorInteractTimer = 0, interactTime;
+    private float environmentInteractTimer = 0, interactTime;
+    private float chanceTimer = 0;
+    private float stopFollowingTimer = 0;
     public bool GetIsChasing() => isChasing;
     public bool GetIsSitting() => isSittingInSofa;
+    public bool GetIsBehindPlayer() => isBehindPlayer;
     #endregion
 
     private void Awake() {
 
         behaviour = FindObjectOfType<YokaiBehaviour>();
-        dungeonKeyItem = FindObjectOfType<DungeonKeyItem>();
         yokaiTransform = behaviour.transform;
 
-        interactTime = UnityEngine.Random.Range(doorInteractTime.x, doorInteractTime.y);
+        interactTime = UnityEngine.Random.Range(environmentInteractTime.x, environmentInteractTime.y);
     }
 
     private void Start() {
@@ -77,7 +83,7 @@ public class YokaiController : MonoBehaviour {
         YokaiObserver.Instance.OnDoorOpenJumpscare += Observer_OnDoorOpen;
         YokaiObserver.Instance.OnUpstairsHallJumpscare += Observer_OnUpstairsHallJumpscare;
         YokaiObserver.Instance.OnBasementEventJumpscare += Observer_OnBasementEventJumpscare;
-        dungeonKeyItem.OnDungeonKeyPickedUp += DungeonKeyItem_OnDungeonKeyPickedUp;
+        YokaiObserver.Instance.OnBasementEventComplete += Observer_OnBasementEventComplete;
     }
 
     private void Update() {
@@ -97,18 +103,64 @@ public class YokaiController : MonoBehaviour {
 
             InteractWithDoors();
         }
+
+        SpawnBehindPlayer();
+    }
+
+    private void SpawnBehindPlayer() {
+
+        if (!behaviour.IsActing()) {
+
+            chanceTimer += Time.deltaTime;
+
+            if (chanceTimer >= chanceTime) {
+
+                chanceTimer = 0;
+                int spawnChance = UnityEngine.Random.Range(0, 101);
+
+                if (spawnChance > 0 && spawnChance < chanceToSpawnBehindPlayer) {
+
+                    Transform playerTransform = YokaiObserver.Instance.GetPlayerTransform();
+                    behaviour.SpawnAtPosition(playerTransform, false);
+                    yokaiTransform.position = playerTransform.position - playerTransform.forward * 1.2f;
+                    isBehindPlayer = true;
+                    OnSpawnBehindPlayer?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        if (behaviour.IsActing() && isBehindPlayer) {
+
+            yokaiTransform.position = playerTransform.position - (playerTransform.position - yokaiTransform.position).normalized * 1.2f;
+            yokaiTransform.forward = (playerTransform.position - yokaiTransform.position).normalized;
+            Vector3 newHeight = yokaiTransform.position;
+            newHeight.y = playerTransform.position.y + 1;
+            yokaiTransform.position = newHeight;
+            Vector3 newEulerAngles = yokaiTransform.eulerAngles;
+            newEulerAngles.x = newEulerAngles.z = 0;
+            yokaiTransform.eulerAngles = newEulerAngles;
+
+            stopFollowingTimer += Time.deltaTime;
+
+            if (stopFollowingTimer > stopFollowingTime) {
+
+                stopFollowingTimer = 0;
+                isBehindPlayer = false;
+                behaviour.DespawnCharacter();
+            }
+        }
     }
 
     private void InteractWithDoors() {
 
-        doorInteractTimer += Time.deltaTime;
+        environmentInteractTimer += Time.deltaTime;
 
-        if (doorInteractTimer >= interactTime) {
+        if (environmentInteractTimer >= interactTime) {
 
-            doorInteractTimer = 0;
-            interactTime = UnityEngine.Random.Range(doorInteractTime.x, doorInteractTime.y);
+            environmentInteractTimer = 0;
+            interactTime = UnityEngine.Random.Range(environmentInteractTime.x, environmentInteractTime.y);
 
-            behaviour.OpenRandomDoor();
+            behaviour.RandomBehaviour();
         }
     }
 
@@ -187,7 +239,7 @@ public class YokaiController : MonoBehaviour {
 
         int randomNumber = UnityEngine.Random.Range(0, 101);
 
-        if (randomNumber > 0 && randomNumber <= chanceToSpawn) {
+        if (randomNumber > 0 && randomNumber <= chanceToSpawnOnRoomEnter) {
 
             behaviour.DespawnCharacter(); // For safery, make sure that the character is not in then scene before calling SpawnAtPosition()
             roomYokaiIsIn = e.room;
@@ -248,17 +300,11 @@ public class YokaiController : MonoBehaviour {
         isSittingInSofa = true;
         behaviour.SetStats(0, 0, 0, false);
         behaviour.SpawnAtPosition(sofaSitPosition, false);
-        dungeonKey.SetActive(true);
-        spotLight.SetActive(true);
-        pointLight.SetActive(true);
-
     }
 
-    private void DungeonKeyItem_OnDungeonKeyPickedUp(object sender, EventArgs e) {
+    private void Observer_OnBasementEventComplete(object sender, EventArgs e) {
 
         isSittingInSofa = false;
-        spotLight.SetActive(false);
-        pointLight.SetActive(false);
         behaviour.DespawnCharacter();
     }
 
@@ -269,12 +315,12 @@ public class YokaiController : MonoBehaviour {
         behaviour.SpawnAtPosition(jumpscareTransform);
         behaviour.RunTowardsPosition(jumpscareTransform.position);
         doorJumpscareEvent = true;
-        Invoke(nameof(Disappear), 4);
+        Invoke(nameof(DisableJumpScareEvent), timeToDisappearFromDoor);
 
         OnYokaiJumpscare?.Invoke(this, EventArgs.Empty);
     }
 
-    private void Disappear() {
+    private void DisableJumpScareEvent() {
 
         doorJumpscareEvent = false;
         behaviour.DespawnCharacter();

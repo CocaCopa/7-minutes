@@ -19,12 +19,18 @@ public class YokaiObserver : MonoBehaviour {
     public event EventHandler OnRunEventChase;
     public event EventHandler OnDoorOpenJumpscare;
     public event EventHandler OnBasementEventJumpscare;
+    public event EventHandler OnBasementEventComplete;
     public event EventHandler<OnUpstairsHallJumpscareEventArgs> OnUpstairsHallJumpscare;
     public event EventHandler<OnValidRoomEnterEventArgs> OnValidRoomEnter;
 
     [Header("--- Running Event ---")]
     [SerializeField] private float yokaiWarnInSeconds;
     [SerializeField] private float yokaiChaseInSeconds;
+
+    [Header("--- Basement Event ---")]
+    [SerializeField] private GameObject dungeonKey;
+    [SerializeField] private GameObject spotLight;
+    [SerializeField] private GameObject pointLight;
 
     [Header("--- Upstairs Hall Event ---")]
     [SerializeField, Range(0,100)] private float chanceToTrigger;
@@ -33,6 +39,7 @@ public class YokaiObserver : MonoBehaviour {
     private Transform playerTransform;
     private PlayerMovement playerMovement;
     private YokaiController controller;
+    private DungeonKeyItem dungeonKeyItem;
 
     private GameObject roomPlayerIsIn;
     private bool canFireOnRunEvent = true;
@@ -49,6 +56,7 @@ public class YokaiObserver : MonoBehaviour {
         Instance = this;
         playerMovement = FindObjectOfType<PlayerMovement>();
         controller = FindObjectOfType<YokaiController>();
+        dungeonKeyItem = FindObjectOfType<DungeonKeyItem>();
         playerTransform = playerMovement.gameObject.transform;
     }
 
@@ -57,6 +65,7 @@ public class YokaiObserver : MonoBehaviour {
         playerMovement.OnRoomEnter += PlayerMovement_OnRoomEnter;
         playerMovement.OnUpstairsHallEvent += PlayerMovement_OnUpstairsHallEvent;
         playerMovement.OnFoundDungeonDoor += PlayerMovement_OnFoundDungeonDoor;
+        dungeonKeyItem.OnDungeonKeyPickedUp += DungeonKeyItem_OnDungeonKeyPickedUp;
 
         Door[] doors = FindObjectsOfType<Door>();
 
@@ -67,6 +76,11 @@ public class YokaiObserver : MonoBehaviour {
         }
     }
 
+    private void Update() {
+
+        PlayerRun_ChaseEvent();
+    }
+
     private void PlayerMovement_OnFoundDungeonDoor(object sender, EventArgs e) {
 
         triggerBasementEvent = true;
@@ -75,7 +89,7 @@ public class YokaiObserver : MonoBehaviour {
 
     private void Door_OnDoorOpen(object sender, Door.OnDoorOpenEventArgs e) {
 
-        if (controller.GetIsChasing()) {
+        if (controller.GetIsChasing() || controller.GetIsBehindPlayer()) {
             return;
         }
 
@@ -130,11 +144,6 @@ public class YokaiObserver : MonoBehaviour {
         }
     }
 
-    private void Update() {
-
-        PlayerRun_ChaseEvent();
-    }
-
     private void PlayerMovement_OnRoomEnter(object sender, PlayerMovement.OnRoomEnterEventArgs e) {
 
         roomPlayerIsIn = e.currentRoom;
@@ -159,17 +168,33 @@ public class YokaiObserver : MonoBehaviour {
             YokaiBrain.SetValidRoomSpawnPositions(null);
         }
 
+        // if player enters the "BasementEntrance" observer will fire an event
+        TriggerBasementEvent(e.currentRoom);
+
+
+        //Debug.Log("Floor: " + PlayerFloorIndex() + " -- Room: " + e.currentRoom.name);
+    }
+
+    private void TriggerBasementEvent(GameObject currentRoom) {
+
         if (triggerBasementEvent) {
 
-            if (e.currentRoom.name == "BasementEntrance") {
+            if (currentRoom.name == "BasementEntrance") {
 
                 triggerBasementEvent = false;
+                dungeonKey.SetActive(true);
+                spotLight.SetActive(true);
+                pointLight.SetActive(true);
                 OnBasementEventJumpscare?.Invoke(this, EventArgs.Empty);
             }
         }
-        
-        
-        //Debug.Log("Floor: " + PlayerFloorIndex() + " -- Room: " + e.currentRoom.name);
+    }
+
+    private void DungeonKeyItem_OnDungeonKeyPickedUp(object sender, EventArgs e) {
+
+        spotLight.SetActive(false);
+        pointLight.SetActive(false);
+        OnBasementEventComplete?.Invoke(this, EventArgs.Empty);
     }
 
     private bool PlayerRun_WarningEvent() {
