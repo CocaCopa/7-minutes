@@ -18,6 +18,7 @@ public class YokaiObserver : MonoBehaviour {
     public event EventHandler OnRunEventWarning;
     public event EventHandler OnRunEventChase;
     public event EventHandler OnDoorOpenJumpscare;
+    public event EventHandler OnBasementEventJumpscare;
     public event EventHandler<OnUpstairsHallJumpscareEventArgs> OnUpstairsHallJumpscare;
     public event EventHandler<OnValidRoomEnterEventArgs> OnValidRoomEnter;
 
@@ -38,6 +39,7 @@ public class YokaiObserver : MonoBehaviour {
     private bool canFireOnChaseEvent = true;
     private float playerRunningTimer = 0;
     private float yokaiChaseTimer = 0;
+    private bool triggerBasementEvent = false;
 
     public Transform GetPlayerTransform() => playerTransform;
     public GameObject GetRoomPlayerIsIn() => roomPlayerIsIn;
@@ -54,6 +56,7 @@ public class YokaiObserver : MonoBehaviour {
 
         playerMovement.OnRoomEnter += PlayerMovement_OnRoomEnter;
         playerMovement.OnUpstairsHallEvent += PlayerMovement_OnUpstairsHallEvent;
+        playerMovement.OnFoundDungeonDoor += PlayerMovement_OnFoundDungeonDoor;
 
         Door[] doors = FindObjectsOfType<Door>();
 
@@ -62,6 +65,12 @@ public class YokaiObserver : MonoBehaviour {
                 door.OnDoorOpen += Door_OnDoorOpen;
             }
         }
+    }
+
+    private void PlayerMovement_OnFoundDungeonDoor(object sender, EventArgs e) {
+
+        triggerBasementEvent = true;
+        playerMovement.OnFoundDungeonDoor -= PlayerMovement_OnFoundDungeonDoor;
     }
 
     private void Door_OnDoorOpen(object sender, Door.OnDoorOpenEventArgs e) {
@@ -150,6 +159,16 @@ public class YokaiObserver : MonoBehaviour {
             YokaiBrain.SetValidRoomSpawnPositions(null);
         }
 
+        if (triggerBasementEvent) {
+
+            if (e.currentRoom.name == "BasementEntrance") {
+
+                triggerBasementEvent = false;
+                OnBasementEventJumpscare?.Invoke(this, EventArgs.Empty);
+            }
+        }
+        
+        
         //Debug.Log("Floor: " + PlayerFloorIndex() + " -- Room: " + e.currentRoom.name);
     }
 
