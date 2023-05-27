@@ -42,12 +42,12 @@ public class YokaiBehaviour : MonoBehaviour {
         return yokaiVisuals.activeInHierarchy;
     }
 
-    public void SpawnAtPosition(Transform m_transform) {
+    public void SpawnAtPosition(Transform m_transform, bool agentEnabled = true) {
 
         transform.position = m_transform.position;
         transform.forward = m_transform.forward;
         yokaiVisuals.SetActive(true);
-        navMeshAgent.enabled = true;
+        navMeshAgent.enabled = agentEnabled;
 
         OnYokaiSpawn?.Invoke(this, EventArgs.Empty);
     }

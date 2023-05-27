@@ -36,12 +36,20 @@ public class YokaiController : MonoBehaviour {
     [SerializeField] private List<Transform> spawnsFloor_1;
     [SerializeField] private List<Transform> spawnsFloor_2;
 
+    [Header("--- Basement Event ---")]
+    [SerializeField] private Transform sofaSitPosition;
+    [SerializeField] private GameObject dungeonKey;
+    [SerializeField] private GameObject spotLight;
+    [SerializeField] private GameObject pointLight;
+
     private YokaiBehaviour behaviour;
+    private DungeonKeyItem dungeonKeyItem;
     private GameObject roomYokaiIsIn;
     private Transform yokaiTransform;
     private Transform playerTransform;
     private bool chasePlayer = false;
     private bool isChasing = false;
+    private bool isSittingInSofa = false;
     private bool doorJumpscareEvent = false; 
     
     private float chaseTimer = 0;
@@ -49,11 +57,13 @@ public class YokaiController : MonoBehaviour {
     private float despawnFromRoomTimer = 0;
     private float doorInteractTimer = 0, interactTime;
     public bool GetIsChasing() => isChasing;
+    public bool GetIsSitting() => isSittingInSofa;
     #endregion
 
     private void Awake() {
 
         behaviour = FindObjectOfType<YokaiBehaviour>();
+        dungeonKeyItem = FindObjectOfType<DungeonKeyItem>();
         yokaiTransform = behaviour.transform;
 
         interactTime = UnityEngine.Random.Range(doorInteractTime.x, doorInteractTime.y);
@@ -66,6 +76,8 @@ public class YokaiController : MonoBehaviour {
         YokaiObserver.Instance.OnValidRoomEnter += Observer_OnValidRoomEnter;
         YokaiObserver.Instance.OnDoorOpenJumpscare += Observer_OnDoorOpen;
         YokaiObserver.Instance.OnUpstairsHallJumpscare += Observer_OnUpstairsHallJumpscare;
+        YokaiObserver.Instance.OnBasementEventJumpscare += Observer_OnBasementEventJumpscare;
+        dungeonKeyItem.OnDungeonKeyPickedUp += DungeonKeyItem_OnDungeonKeyPickedUp;
     }
 
     private void Update() {
@@ -104,7 +116,7 @@ public class YokaiController : MonoBehaviour {
 
         bool nearPlayer = Vector3.Distance(transform.position, playerTransform.position) < rangeToKillPlayer;
 
-        return nearPlayer && behaviour.IsActing();
+        return nearPlayer && behaviour.IsActing() && !isSittingInSofa;
     }
 
     private void ChasePlayerAction() {
@@ -229,6 +241,25 @@ public class YokaiController : MonoBehaviour {
         behaviour.SetStats(upstairsHallEventSpeed, acceleration, 1, true);
         behaviour.SpawnAtPosition(spawnTransform);
         behaviour.RunTowardsPosition(goToPosition, true);
+    }
+
+    private void Observer_OnBasementEventJumpscare(object sender, EventArgs e) {
+
+        isSittingInSofa = true;
+        behaviour.SetStats(0, 0, 0, false);
+        behaviour.SpawnAtPosition(sofaSitPosition, false);
+        dungeonKey.SetActive(true);
+        spotLight.SetActive(true);
+        pointLight.SetActive(true);
+
+    }
+
+    private void DungeonKeyItem_OnDungeonKeyPickedUp(object sender, EventArgs e) {
+
+        isSittingInSofa = false;
+        spotLight.SetActive(false);
+        pointLight.SetActive(false);
+        behaviour.DespawnCharacter();
     }
 
     private void Observer_OnDoorOpen(object sender, System.EventArgs e) {

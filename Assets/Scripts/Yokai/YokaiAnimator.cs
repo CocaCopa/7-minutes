@@ -4,16 +4,27 @@ public class YokaiAnimator : MonoBehaviour {
 
     private Animator animator;
     private YokaiBehaviour agent;
+    private YokaiController controller;
 
     private const string RUN = "Run";
     private const string CRAWL_RUN = "CrawlRun";
+    private const string SITTING = "Sitting";
 
     private bool chooseAnimation = false;
 
     private void Awake() {
 
         animator = GetComponent<Animator>();
+
         agent = GetComponentInParent<YokaiBehaviour>();
+        controller = FindObjectOfType<YokaiController>();
+
+        
+    }
+
+    private void OnEnable() {
+
+        animator.SetBool(SITTING, controller.GetIsSitting());
     }
 
     private void Update() {
@@ -43,5 +54,10 @@ public class YokaiAnimator : MonoBehaviour {
                 animator.SetBool(CRAWL_RUN, true);
             }
         }
+    }
+
+    private void OnDisable() {
+        
+        animator.SetBool(SITTING, false);
     }
 }
