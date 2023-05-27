@@ -1,23 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public class CollectedItem : MonoBehaviour
 {
-    [SerializeField] private Material materialWhenHidden;
+    [SerializeField] private Material defaultMaterial;
+    [SerializeField] private GameObject maskLight;
     [SerializeField] private int collectibleId;
 
-    private PlayerInventory inventory;
     private MeshRenderer meshRenderer;
-    private Material defaultMaterial;
 
     private void Awake() {
 
-        inventory = FindObjectOfType<PlayerInventory>();
         meshRenderer = GetComponentInChildren<MeshRenderer>();
-        defaultMaterial = meshRenderer.material;
-
-        meshRenderer.material = materialWhenHidden;
     }
 
     private void Start() {
@@ -35,6 +31,7 @@ public class CollectedItem : MonoBehaviour
         if (collectibleId == e.id) {
 
             meshRenderer.material = defaultMaterial;
+            maskLight.SetActive(true);
         }
     }
 }
