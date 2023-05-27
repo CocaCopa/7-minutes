@@ -11,6 +11,8 @@ public class YokaiController : MonoBehaviour {
     [SerializeField] private float rangeToKillPlayer;
     [SerializeField] private float walkSpeed;
     [SerializeField] private float runSpeed;
+    [SerializeField] private float upstairsHallEventSpeed;
+    [SerializeField] private float acceleration;
 
     [Header("--- Interact with Environment ---")]
     [SerializeField] private GameObject[] equipableItems;
@@ -111,6 +113,8 @@ public class YokaiController : MonoBehaviour {
 
             isChasing = true;
             chaseTimer += Time.deltaTime;
+
+            behaviour.SetStats(runSpeed, acceleration, 4);
             behaviour.ChasePlayer();
 
             if (chaseTimer > chaseTime) {
@@ -222,6 +226,7 @@ public class YokaiController : MonoBehaviour {
         Transform spawnTransform = e.startTransform;
         Vector3 goToPosition = e.endTransform.position;
 
+        behaviour.SetStats(upstairsHallEventSpeed, acceleration, 1, true);
         behaviour.SpawnAtPosition(spawnTransform);
         behaviour.RunTowardsPosition(goToPosition, true);
     }

@@ -52,6 +52,14 @@ public class YokaiBehaviour : MonoBehaviour {
         OnYokaiSpawn?.Invoke(this, EventArgs.Empty);
     }
 
+    public void SetStats(float movementSpeed, float acceleration, float stoppingDistance, bool autobraking = false) {
+
+        navMeshAgent.speed = movementSpeed;
+        navMeshAgent.acceleration = acceleration;
+        navMeshAgent.stoppingDistance = stoppingDistance;
+        navMeshAgent.autoBraking = autobraking;
+    }
+
     public void DespawnCharacter() {
 
         navMeshAgent.enabled = false;
@@ -67,8 +75,6 @@ public class YokaiBehaviour : MonoBehaviour {
         }
 
         Vector3 playerPosition = YokaiObserver.Instance.GetPlayerTransform().position;
-        navMeshAgent.acceleration = 8;
-        navMeshAgent.speed = 4f;
         navMeshAgent.destination = playerPosition;
     }
 
@@ -103,9 +109,6 @@ public class YokaiBehaviour : MonoBehaviour {
 
     public void RunTowardsPosition(Vector3 position, bool despawnOnPositionReach = false) {
 
-        navMeshAgent.acceleration = 3f;
-        navMeshAgent.speed = 3.5f;
-        navMeshAgent.stoppingDistance = 0;
         navMeshAgent.destination = position;
 
         if (despawnOnPositionReach) {
