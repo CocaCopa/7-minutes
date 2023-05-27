@@ -5,7 +5,9 @@ using UnityEngine.AI;
 
 public class YokaiBehaviour : MonoBehaviour {
 
-    public event EventHandler OnStartRunning;
+    public event EventHandler OnYokaiSpawn;
+    public event EventHandler OnYokaiDespawn;
+
     [SerializeField] private GameObject yokaiVisuals;
     [SerializeField] private List<GameObject> interactables;
 
@@ -13,10 +15,26 @@ public class YokaiBehaviour : MonoBehaviour {
     private GameObject equippedItem;
 
     private bool isRunning;
+    private bool disappearOnTargetPosition = false;
+    private Vector3 targetPosition;
 
     private void Awake() {
 
         navMeshAgent = GetComponentInChildren<NavMeshAgent>();
+    }
+
+    private void Update() {
+
+        if (disappearOnTargetPosition) {
+
+            bool reachedPosition = Vector3.Distance(transform.position, targetPosition) < 1.5f;
+
+            if (reachedPosition) {
+
+                disappearOnTargetPosition = false;
+                Invoke(nameof(DespawnCharacter), 1.2f);
+            }
+        }
     }
 
     public bool IsActing() {
@@ -30,12 +48,16 @@ public class YokaiBehaviour : MonoBehaviour {
         transform.forward = m_transform.forward;
         yokaiVisuals.SetActive(true);
         navMeshAgent.enabled = true;
+
+        OnYokaiSpawn?.Invoke(this, EventArgs.Empty);
     }
 
     public void DespawnCharacter() {
 
         navMeshAgent.enabled = false;
         yokaiVisuals.SetActive(false);
+
+        OnYokaiDespawn?.Invoke(this, EventArgs.Empty);
     }
 
     public void ChasePlayer() {
@@ -43,8 +65,6 @@ public class YokaiBehaviour : MonoBehaviour {
         if (!navMeshAgent.enabled) {
             return;
         }
-
-        
 
         Vector3 playerPosition = YokaiObserver.Instance.GetPlayerTransform().position;
         navMeshAgent.acceleration = 8;
@@ -76,23 +96,23 @@ public class YokaiBehaviour : MonoBehaviour {
         interactables[randomIndex].GetComponent<IInteractable>().Interact();
     }
 
-    private void Update() {
-        
-        if (Input.GetKeyDown(KeyCode.Q)) {
-            OpenRandomDoor();
-        }
-    }
     public void KillPlayer() {
 
 
     }
 
-    public void RunTowardsPosition(Vector3 position) {
+    public void RunTowardsPosition(Vector3 position, bool despawnOnPositionReach = false) {
 
         navMeshAgent.acceleration = 3f;
         navMeshAgent.speed = 3.5f;
+        navMeshAgent.stoppingDistance = 0;
         navMeshAgent.destination = position;
-        OnStartRunning?.Invoke(this, EventArgs.Empty);
+
+        if (despawnOnPositionReach) {
+
+            disappearOnTargetPosition = true;
+            targetPosition = position;
+        }
     }
     
     public void RandomBehaviour() {

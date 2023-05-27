@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class YokaiController : MonoBehaviour {
 
-    public event EventHandler OnYokaiSpawn;
-    public event EventHandler OnYokaiDespawn;
     public event EventHandler OnYokaiJumpscare;
 
     #region Variables:
@@ -14,9 +12,12 @@ public class YokaiController : MonoBehaviour {
     [SerializeField] private float walkSpeed;
     [SerializeField] private float runSpeed;
 
-    [Header("--- Items ---")]
+    [Header("--- Interact with Environment ---")]
     [SerializeField] private GameObject[] equipableItems;
     [SerializeField] private float throwForce;
+    [Space(4)]
+    [SerializeField] private GameObject[] doorObjects;
+    [SerializeField] private Vector2 doorInteractTime;
 
     [Header("--- Chase ---")]
     [Tooltip("The minimum distance from player the Yokai can spawn")]
@@ -37,12 +38,14 @@ public class YokaiController : MonoBehaviour {
     private GameObject roomYokaiIsIn;
     private Transform yokaiTransform;
     private Transform playerTransform;
+    private bool chasePlayer = false;
+    private bool isChasing = false;
+    private bool doorJumpscareEvent = false; 
+    
     private float chaseTimer = 0;
     private float sameRoomChaseTimer = 0;
     private float despawnFromRoomTimer = 0;
-    private bool chasePlayer = false;
-    private bool isChasing = false;
-    private bool yokaiJumpscare = false;
+    private float doorInteractTimer = 0, interactTime;
     public bool GetIsChasing() => isChasing;
     #endregion
 
@@ -50,6 +53,8 @@ public class YokaiController : MonoBehaviour {
 
         behaviour = FindObjectOfType<YokaiBehaviour>();
         yokaiTransform = behaviour.transform;
+
+        interactTime = UnityEngine.Random.Range(doorInteractTime.x, doorInteractTime.y);
     }
 
     private void Start() {
@@ -57,23 +62,47 @@ public class YokaiController : MonoBehaviour {
         playerTransform = YokaiObserver.Instance.GetPlayerTransform();
         YokaiObserver.Instance.OnRunEventChase += Observer_OnRunEventChase;
         YokaiObserver.Instance.OnValidRoomEnter += Observer_OnValidRoomEnter;
-        YokaiObserver.Instance.OnDoorOpenJumpscare += Door_OnDoorOpen;
+        YokaiObserver.Instance.OnDoorOpenJumpscare += Observer_OnDoorOpen;
+        YokaiObserver.Instance.OnUpstairsHallJumpscare += Observer_OnUpstairsHallJumpscare;
     }
 
     private void Update() {
 
-        if (!yokaiJumpscare) {
+        if (!doorJumpscareEvent) {
 
             ChasePlayerAction();
             SpawnedInRoomAction();
         }
 
-        bool nearPlayer = Vector3.Distance(transform.position, playerTransform.position) < rangeToKillPlayer;
-
-        if (nearPlayer) {
+        if (CanAttackPlayer()) {
 
             behaviour.KillPlayer();
         }
+
+        if (!behaviour.IsActing()) {
+
+            InteractWithDoors();
+        }
+    }
+
+    private void InteractWithDoors() {
+
+        doorInteractTimer += Time.deltaTime;
+
+        if (doorInteractTimer >= interactTime) {
+
+            doorInteractTimer = 0;
+            interactTime = UnityEngine.Random.Range(doorInteractTime.x, doorInteractTime.y);
+
+            behaviour.OpenRandomDoor();
+        }
+    }
+
+    private bool CanAttackPlayer() {
+
+        bool nearPlayer = Vector3.Distance(transform.position, playerTransform.position) < rangeToKillPlayer;
+
+        return nearPlayer && behaviour.IsActing();
     }
 
     private void ChasePlayerAction() {
@@ -91,7 +120,6 @@ public class YokaiController : MonoBehaviour {
                 chaseTimer = 0;
 
                 behaviour.DespawnCharacter();
-                OnYokaiDespawn?.Invoke(this, EventArgs.Empty);
             }
         }
     }
@@ -125,7 +153,6 @@ public class YokaiController : MonoBehaviour {
                     roomYokaiIsIn = null;
                     despawnFromRoomTimer = 0;
                     behaviour.DespawnCharacter();
-                    OnYokaiDespawn?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -148,10 +175,9 @@ public class YokaiController : MonoBehaviour {
 
             behaviour.DespawnCharacter(); // For safery, make sure that the character is not in then scene before calling SpawnAtPosition()
             roomYokaiIsIn = e.room;
-            List<Transform> validSpawns = YokaiBrain.GetValidSpawnPositions();
+            List<Transform> validSpawns = YokaiBrain.GetValidRoomSpawnPositions();
             int randomIndex = UnityEngine.Random.Range(0, validSpawns.Count);
             behaviour.SpawnAtPosition(validSpawns[randomIndex]);
-            OnYokaiSpawn?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -184,17 +210,29 @@ public class YokaiController : MonoBehaviour {
         spawnPosition = YokaiBrain.SelectPosition(spawns, chaseMinSpawnDistance, playerPosition);
 
         behaviour.SpawnAtPosition(spawnPosition);
-        OnYokaiSpawn?.Invoke(this, EventArgs.Empty);
         chasePlayer = true;
     }
 
-    private void Door_OnDoorOpen(object sender, System.EventArgs e) {
+    private void Observer_OnUpstairsHallJumpscare(object sender, YokaiObserver.OnUpstairsHallJumpscareEventArgs e) {
+
+        if (behaviour.IsActing()) {
+            return;
+        }
+
+        Transform spawnTransform = e.startTransform;
+        Vector3 goToPosition = e.endTransform.position;
+
+        behaviour.SpawnAtPosition(spawnTransform);
+        behaviour.RunTowardsPosition(goToPosition, true);
+    }
+
+    private void Observer_OnDoorOpen(object sender, System.EventArgs e) {
 
         Transform jumpscareTransform = YokaiBrain.GetJumpscareDoorTransform();
 
         behaviour.SpawnAtPosition(jumpscareTransform);
         behaviour.RunTowardsPosition(jumpscareTransform.position);
-        yokaiJumpscare = true;
+        doorJumpscareEvent = true;
         Invoke(nameof(Disappear), 4);
 
         OnYokaiJumpscare?.Invoke(this, EventArgs.Empty);
@@ -202,8 +240,7 @@ public class YokaiController : MonoBehaviour {
 
     private void Disappear() {
 
-        yokaiJumpscare = false;
+        doorJumpscareEvent = false;
         behaviour.DespawnCharacter();
-        OnYokaiDespawn?.Invoke(this, EventArgs.Empty);
     }
 }

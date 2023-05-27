@@ -9,17 +9,17 @@ public class YokaiObserver : MonoBehaviour {
     public class OnValidRoomEnterEventArgs { 
         public GameObject room;
     }
+    public class OnUpstairsHallJumpscareEventArgs {
+
+        public Transform startTransform;
+        public Transform endTransform;
+    }
 
     public event EventHandler OnRunEventWarning;
     public event EventHandler OnRunEventChase;
     public event EventHandler OnDoorOpenJumpscare;
+    public event EventHandler<OnUpstairsHallJumpscareEventArgs> OnUpstairsHallJumpscare;
     public event EventHandler<OnValidRoomEnterEventArgs> OnValidRoomEnter;
-
-    [Header("--- Library Event ---")]
-    [SerializeField] private Transform[] jumpscareDoorsTransform;
-    [SerializeField] private Transform runTowards;
-
-    [Space(10)]
 
     [Header("--- Running Event ---")]
     [SerializeField] private float yokaiWarnInSeconds;
@@ -27,6 +27,7 @@ public class YokaiObserver : MonoBehaviour {
 
     [Header("--- Upstairs Hall Event ---")]
     [SerializeField, Range(0,100)] private float chanceToTrigger;
+    [SerializeField] private GameObject[] yokaiPathHolders;
 
     private Transform playerTransform;
     private PlayerMovement playerMovement;
@@ -90,10 +91,33 @@ public class YokaiObserver : MonoBehaviour {
 
     private void PlayerMovement_OnUpstairsHallEvent(object sender, EventArgs e) {
 
+        GameObject selectedSide = null;
+        Transform startTransform;
+        Transform endTransform;
+
         int chance = UnityEngine.Random.Range(0, 101);
 
         if (chance > 0 && chance <= chanceToTrigger) {
 
+            foreach (var side in yokaiPathHolders) {
+
+                bool playerLooksSide = Vector3.Dot(side.transform.forward, playerTransform.forward) < 0;
+
+                if (playerLooksSide) {
+
+                    selectedSide = side;
+                    break;
+                }
+            }
+
+            startTransform = selectedSide.transform.GetChild(0);
+            endTransform = selectedSide.transform.GetChild(1);
+
+            OnUpstairsHallJumpscare?.Invoke(this, new OnUpstairsHallJumpscareEventArgs {
+
+                startTransform = startTransform,
+                endTransform = endTransform
+            });
         }
     }
 
@@ -116,14 +140,14 @@ public class YokaiObserver : MonoBehaviour {
                 validSpawns.Add(spawnsHolder.transform.GetChild(i));
             }
 
-            YokaiBrain.SetValidSpawnPositions(validSpawns);
+            YokaiBrain.SetValidRoomSpawnPositions(validSpawns);
             OnValidRoomEnter?.Invoke(this, new OnValidRoomEnterEventArgs {
                 room = e.currentRoom
             });
         }
         else {
 
-            YokaiBrain.SetValidSpawnPositions(null);
+            YokaiBrain.SetValidRoomSpawnPositions(null);
         }
 
         //Debug.Log("Floor: " + PlayerFloorIndex() + " -- Room: " + e.currentRoom.name);

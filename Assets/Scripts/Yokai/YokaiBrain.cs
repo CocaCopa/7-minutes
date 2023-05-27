@@ -10,7 +10,7 @@ public class YokaiBrain : MonoBehaviour {
     public static Transform GetJumpscareDoorTransform() => jumpscareDoorTransform;
     public static void SetJumpscareDoorTransform(Transform value) => jumpscareDoorTransform = value;
 
-    public static void SetValidSpawnPositions(List<Transform> positions) {
+    public static void SetValidRoomSpawnPositions(List<Transform> positions) {
 
         spawnPositions.Clear();
         if (positions != null) {
@@ -18,7 +18,7 @@ public class YokaiBrain : MonoBehaviour {
         }
     }
 
-    public static List<Transform> GetValidSpawnPositions() {
+    public static List<Transform> GetValidRoomSpawnPositions() {
 
         return spawnPositions;
     }
