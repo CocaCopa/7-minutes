@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour {
 
     public event EventHandler<OnRoomEnterEventArgs> OnRoomEnter;
+    public event EventHandler OnUpstairsHallEvent;
+    public event EventHandler OnYokaiBasementEvent;
 
     public class OnRoomEnterEventArgs {
 
@@ -109,17 +111,28 @@ public class PlayerMovement : MonoBehaviour {
     GameObject previousRoom;
     private void OnTriggerEnter(Collider other) {
 
-        bool enteredDifferentRoom = other.gameObject != previousRoom;
+        if (other.CompareTag("Trigger/EnteredRoom")) {
+            
+            bool enteredDifferentRoom = other.gameObject != previousRoom;
 
-        if (enteredDifferentRoom) {
+            if (enteredDifferentRoom) {
 
-            OnRoomEnter?.Invoke(this, new OnRoomEnterEventArgs {
+                OnRoomEnter?.Invoke(this, new OnRoomEnterEventArgs {
 
-                currentRoom = other.gameObject.transform.parent.gameObject,
-                previousRoom = previousRoom
-            });
+                    currentRoom = other.gameObject.transform.parent.gameObject,
+                    previousRoom = previousRoom
+                });
+            }
+
+            previousRoom = other.gameObject;
         }
+        else if (other.CompareTag("Trigger/YokaiBasementEvent")) {
 
-        previousRoom = other.gameObject;
+            OnYokaiBasementEvent?.Invoke(this, EventArgs.Empty);
+        }
+        else if (other.CompareTag("Trigger/UpstairsHallEvent")) {
+
+            OnUpstairsHallEvent?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

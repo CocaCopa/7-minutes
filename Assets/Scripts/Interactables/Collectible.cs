@@ -1,10 +1,6 @@
 using UnityEngine;
 
-public class Collectible : MonoBehaviour, IInteractable {
-    
-    public void Interact() {
+public abstract class Collectible : MonoBehaviour, IInteractable {
 
-        FindObjectOfType<PlayerInventory>().AddItemToList(this.gameObject);
-        gameObject.SetActive(false);
-    }
+    public abstract void Interact();
 }

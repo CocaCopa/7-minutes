@@ -1,15 +1,18 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class YokaiBehaviour : MonoBehaviour {
 
+    public event EventHandler OnStartRunning;
     [SerializeField] private GameObject yokaiVisuals;
     [SerializeField] private List<GameObject> interactables;
 
     private NavMeshAgent navMeshAgent;
     private GameObject equippedItem;
+
+    private bool isRunning;
 
     private void Awake() {
 
@@ -41,6 +44,8 @@ public class YokaiBehaviour : MonoBehaviour {
             return;
         }
 
+        
+
         Vector3 playerPosition = YokaiObserver.Instance.GetPlayerTransform().position;
         navMeshAgent.acceleration = 8;
         navMeshAgent.speed = 4f;
@@ -49,7 +54,7 @@ public class YokaiBehaviour : MonoBehaviour {
 
     public void EquipItem(List<GameObject> equipableItems) {
 
-        int randomIndex = Random.Range(0, equipableItems.Count);
+        int randomIndex = UnityEngine.Random.Range(0, equipableItems.Count);
         GameObject randomItem = equipableItems[randomIndex];
         Rigidbody rb = randomItem.AddComponent<Rigidbody>();
         rb.isKinematic = true;
@@ -66,7 +71,7 @@ public class YokaiBehaviour : MonoBehaviour {
 
     public void OpenRandomDoor() {
 
-        int randomIndex = Random.Range(0, interactables.Count);
+        int randomIndex = UnityEngine.Random.Range(0, interactables.Count);
 
         interactables[randomIndex].GetComponent<IInteractable>().Interact();
     }
@@ -87,6 +92,7 @@ public class YokaiBehaviour : MonoBehaviour {
         navMeshAgent.acceleration = 3f;
         navMeshAgent.speed = 3.5f;
         navMeshAgent.destination = position;
+        OnStartRunning?.Invoke(this, EventArgs.Empty);
     }
     
     public void RandomBehaviour() {
@@ -95,4 +101,5 @@ public class YokaiBehaviour : MonoBehaviour {
     }
 
     public float GetCurrentSpeed() => navMeshAgent.velocity.magnitude;
+    public bool GetIsRunning() => isRunning = navMeshAgent.velocity.magnitude > 0 ? true : false;
 }

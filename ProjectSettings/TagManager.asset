@@ -5,7 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Stair
-  - TriggerJumpscare
+  - Trigger/EnteredRoom
+  - Trigger/YokaiBasementEvent
+  - Trigger/UpstairsHallEvent
   layers:
   - Default
   - TransparentFX

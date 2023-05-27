@@ -12,6 +12,7 @@ public class YokaiObserver : MonoBehaviour {
 
     public event EventHandler OnRunEventWarning;
     public event EventHandler OnRunEventChase;
+    public event EventHandler OnDoorOpenJumpscare;
     public event EventHandler<OnValidRoomEnterEventArgs> OnValidRoomEnter;
 
     [Header("--- Library Event ---")]
@@ -24,9 +25,11 @@ public class YokaiObserver : MonoBehaviour {
     [SerializeField] private float yokaiWarnInSeconds;
     [SerializeField] private float yokaiChaseInSeconds;
 
+    [Header("--- Upstairs Hall Event ---")]
+    [SerializeField, Range(0,100)] private float chanceToTrigger;
+
     private Transform playerTransform;
     private PlayerMovement playerMovement;
-    private YokaiBrain brain;
     private YokaiController controller;
 
     private GameObject roomPlayerIsIn;
@@ -42,7 +45,6 @@ public class YokaiObserver : MonoBehaviour {
 
         Instance = this;
         playerMovement = FindObjectOfType<PlayerMovement>();
-        brain = FindObjectOfType<YokaiBrain>();
         controller = FindObjectOfType<YokaiController>();
         playerTransform = playerMovement.gameObject.transform;
     }
@@ -50,6 +52,49 @@ public class YokaiObserver : MonoBehaviour {
     private void Start() {
 
         playerMovement.OnRoomEnter += PlayerMovement_OnRoomEnter;
+        playerMovement.OnUpstairsHallEvent += PlayerMovement_OnUpstairsHallEvent;
+
+        Door[] doors = FindObjectsOfType<Door>();
+
+        foreach (var door in doors) {
+            if (door.GetFireEvent()) {
+                door.OnDoorOpen += Door_OnDoorOpen;
+            }
+        }
+    }
+
+    private void Door_OnDoorOpen(object sender, Door.OnDoorOpenEventArgs e) {
+
+        if (controller.GetIsChasing()) {
+            return;
+        }
+
+        bool playerInsideEventRoom = Vector3.Dot(e.jumpscareTransform.forward, playerTransform.forward) > 0;
+
+        if (playerInsideEventRoom) {
+            return;
+        }
+
+        if (e.isOpen) {
+
+            YokaiBrain.SetJumpscareDoorTransform(e.jumpscareTransform);
+
+            Door[] doors = FindObjectsOfType<Door>();
+            foreach (var door in doors) {
+                door.OnDoorOpen -= Door_OnDoorOpen;
+            }
+
+            OnDoorOpenJumpscare?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    private void PlayerMovement_OnUpstairsHallEvent(object sender, EventArgs e) {
+
+        int chance = UnityEngine.Random.Range(0, 101);
+
+        if (chance > 0 && chance <= chanceToTrigger) {
+
+        }
     }
 
     private void Update() {
@@ -71,14 +116,14 @@ public class YokaiObserver : MonoBehaviour {
                 validSpawns.Add(spawnsHolder.transform.GetChild(i));
             }
 
-            brain.SetValidSpawnPositions(validSpawns);
+            YokaiBrain.SetValidSpawnPositions(validSpawns);
             OnValidRoomEnter?.Invoke(this, new OnValidRoomEnterEventArgs {
                 room = e.currentRoom
             });
         }
         else {
 
-            brain.SetValidSpawnPositions(null);
+            YokaiBrain.SetValidSpawnPositions(null);
         }
 
         //Debug.Log("Floor: " + PlayerFloorIndex() + " -- Room: " + e.currentRoom.name);
@@ -98,8 +143,8 @@ public class YokaiObserver : MonoBehaviour {
                 // Warn player that chase event will happen if he/she continues running
                 if (canFireOnRunEvent) {
 
-                    canFireOnRunEvent = false;
                     OnRunEventWarning?.Invoke(this, EventArgs.Empty);
+                    canFireOnRunEvent = false;
                 }
                 return true;
             }
@@ -124,8 +169,8 @@ public class YokaiObserver : MonoBehaviour {
                 // Inform that yoikai should start chasing
                 if (canFireOnChaseEvent) {
 
-                    canFireOnChaseEvent = false;
                     OnRunEventChase?.Invoke(this, EventArgs.Empty);
+                    canFireOnChaseEvent = false;
                 }
             }
         }
