@@ -117,6 +117,7 @@ public class PlayerAudio : MonoBehaviour {
                         selectedAudioClip = carpetSurface[randomClipIndex];
                         previousClip = selectedAudioClip;
                         break;
+
                         default:
                         selectedAudioClip = previousClip;
                         break;
