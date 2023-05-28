@@ -27,11 +27,18 @@ public class YokaiController : MonoBehaviour {
     [SerializeField] private float sameRoomChaseTime;
     [Tooltip("How long should the Yokai stay in the room it spawned, when the player has left the room")]
     [SerializeField] private float despawnFromRoomTime;
-
-    [Header("--- Chance To Spawn On Room Enter ---")]
-    [SerializeField, Range(0, 100)] private int chanceToSpawnOnRoomEnter;
+    [SerializeField] private List<Transform> spawnsFloor_0;
     [SerializeField] private List<Transform> spawnsFloor_1;
     [SerializeField] private List<Transform> spawnsFloor_2;
+
+    [Header("--- Spawn Behind Player ---")]
+    [SerializeField, Range(0, 100)] private float chanceToSpawnBehindPlayer;
+    [Tooltip("Roll the dice to spawn behind player every 'x' seconds")]
+    [SerializeField] private float chanceTime;
+    [SerializeField] private float stopFollowingTime;
+
+    [Header("--- On Room Enter ---")]
+    [SerializeField, Range(0, 100)] private int chanceToSpawnOnRoomEnter;
 
     [Header("--- Basement Event ---")]
     [SerializeField] private Transform sofaSitPosition;
@@ -39,11 +46,6 @@ public class YokaiController : MonoBehaviour {
     [Header("-- On Door Open Event ---")]
     [SerializeField] private float timeToDisappearFromDoor;
 
-    [Header("--- Spawn Behind Player ---")]
-    [SerializeField, Range(0, 100)] private float chanceToSpawnBehindPlayer;
-    [Tooltip("Roll the dice to spawn behind player every 'x' seconds")]
-    [SerializeField] private float chanceTime;
-    [SerializeField] private float stopFollowingTime;
 
     private YokaiBehaviour behaviour;
     private GameObject roomYokaiIsIn;
@@ -267,6 +269,12 @@ public class YokaiController : MonoBehaviour {
 
         switch (floorIndex) {
 
+            case -1:
+            spawns = spawnsFloor_0;
+            break;
+            case 0:
+            spawns = spawnsFloor_0;
+            break;
             case 1:
             spawns = spawnsFloor_1;
             break;
