@@ -11,10 +11,13 @@ public class PlayerAudio : MonoBehaviour {
     [Space(10)]
     [SerializeField] private float footstepTimeWalking;
     [SerializeField] private float footstepTimeRunning;
+    [Space(10)]
+    [SerializeField] private AudioClip heavyBreathing;
 
     private AudioSource audioSource;
     private AudioClip previousClip;
     private PlayerMovement playerMovement;
+    private YokaiBehaviour yokaiBehaviour;
 
     private float footstepTimer = 0;
 
@@ -22,7 +25,26 @@ public class PlayerAudio : MonoBehaviour {
 
         audioSource = GetComponent<AudioSource>();
         playerMovement = GetComponentInParent<PlayerMovement>();
+        yokaiBehaviour = FindObjectOfType<YokaiBehaviour>();
     }
+
+    private void Start() {
+
+        YokaiObserver.Instance.OnBasementEventJumpscare += Observer_OnBasementEventJumpscare;
+        yokaiBehaviour.OnYokaiSpawn += YokaiBehaviour_OnYokaiSpawn;
+    }
+
+    private void YokaiBehaviour_OnYokaiSpawn(object sender, System.EventArgs e) {
+
+        audioSource.PlayOneShot(heavyBreathing);
+    }
+
+    private void Observer_OnBasementEventJumpscare(object sender, System.EventArgs e) {
+
+        audioSource.PlayOneShot(heavyBreathing);
+    }
+
+    
 
     private void Update() {
 

@@ -55,7 +55,6 @@ public class YokaiController : MonoBehaviour {
     private bool chasePlayer = false;
     private bool doorJumpscareEvent = false;
     private bool isChasing = false;
-    private bool basementEventActive = false;
     private bool isBehindPlayer = false;
     
     private float chaseTimer = 0;
@@ -65,7 +64,6 @@ public class YokaiController : MonoBehaviour {
     private float chanceTimer = 0;
     private float stopFollowingTimer = 0;
     public bool GetIsChasing() => isChasing;
-    public bool GetIsSitting() => basementEventActive;
     public bool GetIsBehindPlayer() => isBehindPlayer;
     #endregion
 
@@ -111,7 +109,7 @@ public class YokaiController : MonoBehaviour {
 
     private void SpawnBehindPlayer() {
 
-        if (!behaviour.IsActing() && !basementEventActive) {
+        if (!behaviour.IsActing() && !YokaiObserver.Instance.GetBasementEventActive()) {
 
             chanceTimer += Time.deltaTime;
 
@@ -170,7 +168,7 @@ public class YokaiController : MonoBehaviour {
 
         bool nearPlayer = Vector3.Distance(transform.position, playerTransform.position) < rangeToKillPlayer;
 
-        return nearPlayer && behaviour.IsActing() && !basementEventActive;
+        return nearPlayer && behaviour.IsActing() && !YokaiObserver.Instance.GetBasementEventActive();
     }
 
     private void ChasePlayerAction() {
@@ -285,6 +283,7 @@ public class YokaiController : MonoBehaviour {
 
         spawnPosition = YokaiBrain.SelectPosition(spawns, chaseMinSpawnDistance, playerPosition);
 
+        behaviour.SetStats(runSpeed, acceleration / 2, 0, true);
         behaviour.SpawnAtPosition(spawnPosition);
         chasePlayer = true;
     }
@@ -305,14 +304,12 @@ public class YokaiController : MonoBehaviour {
 
     private void Observer_OnBasementEventJumpscare(object sender, EventArgs e) {
 
-        basementEventActive = true;
         behaviour.SetStats(0, 0, 0, false);
         behaviour.SpawnAtPosition(sofaSitPosition, false);
     }
 
     private void Observer_OnBasementEventComplete(object sender, EventArgs e) {
 
-        basementEventActive = false;
         behaviour.DespawnCharacter();
     }
 

@@ -24,7 +24,7 @@ public class YokaiAnimator : MonoBehaviour {
 
     private void OnEnable() {
 
-        animator.SetBool(SITTING, controller.GetIsSitting());
+        animator.SetBool(SITTING, YokaiObserver.Instance.GetBasementEventActive());
     }
 
     private void Update() {

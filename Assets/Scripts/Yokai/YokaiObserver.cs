@@ -48,6 +48,7 @@ public class YokaiObserver : MonoBehaviour {
     private float yokaiChaseTimer = 0;
     private bool canTriggerBasementEvent = false;
     private bool basementEventActive = false;
+    public bool GetBasementEventActive() => basementEventActive;
 
     public Transform GetPlayerTransform() => playerTransform;
     public GameObject GetRoomPlayerIsIn() => roomPlayerIsIn;
