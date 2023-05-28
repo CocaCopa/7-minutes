@@ -46,7 +46,8 @@ public class YokaiObserver : MonoBehaviour {
     private bool canFireOnChaseEvent = true;
     private float playerRunningTimer = 0;
     private float yokaiChaseTimer = 0;
-    private bool triggerBasementEvent = false;
+    private bool canTriggerBasementEvent = false;
+    private bool basementEventActive = false;
 
     public Transform GetPlayerTransform() => playerTransform;
     public GameObject GetRoomPlayerIsIn() => roomPlayerIsIn;
@@ -83,7 +84,8 @@ public class YokaiObserver : MonoBehaviour {
 
     private void PlayerMovement_OnFoundDungeonDoor(object sender, EventArgs e) {
 
-        triggerBasementEvent = true;
+        basementEventActive = true;
+        canTriggerBasementEvent = true;
         playerMovement.OnFoundDungeonDoor -= PlayerMovement_OnFoundDungeonDoor;
     }
 
@@ -177,11 +179,11 @@ public class YokaiObserver : MonoBehaviour {
 
     private void TriggerBasementEvent(GameObject currentRoom) {
 
-        if (triggerBasementEvent) {
+        if (canTriggerBasementEvent) {
 
             if (currentRoom.name == "BasementEntrance") {
 
-                triggerBasementEvent = false;
+                canTriggerBasementEvent = false;
                 dungeonKey.SetActive(true);
                 spotLight.SetActive(true);
                 pointLight.SetActive(true);
@@ -192,6 +194,7 @@ public class YokaiObserver : MonoBehaviour {
 
     private void DungeonKeyItem_OnDungeonKeyPickedUp(object sender, EventArgs e) {
 
+        basementEventActive = false;
         spotLight.SetActive(false);
         pointLight.SetActive(false);
         OnBasementEventComplete?.Invoke(this, EventArgs.Empty);
@@ -202,7 +205,7 @@ public class YokaiObserver : MonoBehaviour {
         bool playerIsRunning = playerMovement.GetIsRunning();
         bool yokaiIsChasing = controller.GetIsChasing();
 
-        if (playerIsRunning && !yokaiIsChasing) {
+        if (playerIsRunning && !yokaiIsChasing && !basementEventActive) {
 
             playerRunningTimer += Time.deltaTime;
 
