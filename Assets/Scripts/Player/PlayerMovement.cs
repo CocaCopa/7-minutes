@@ -35,10 +35,13 @@ public class PlayerMovement : MonoBehaviour {
         controller = GetComponent<CharacterController>();
         cameraTransform = Camera.main.transform;
     }
-
+    public float distance;
+    public float radius;
+    public LayerMask layermask;
     public Vector3 HandleMovement() {
 
-        groundedPlayer = controller.isGrounded;
+        groundedPlayer = IsGrounded();
+
         if (groundedPlayer && playerVelocity.y <= 0) {
             playerVelocity.y = 0f;
         }
@@ -106,6 +109,16 @@ public class PlayerMovement : MonoBehaviour {
         bool facingUp = Vector3.Dot(Camera.main.transform.forward, Vector3.down) < 0;
 
         return onStairs && movingForward && facingUp;
+    }
+
+    private bool IsGrounded() {
+
+        Vector3 origin = transform.position + Vector3.up;
+        Vector3 direction = -transform.up;
+        float radius = 0.31f; // Player collider radius
+        float maxDistance = 0.725f; // As much as it needs to hit the ground
+
+        return Physics.SphereCast(new Ray(origin, direction), radius, maxDistance, ~LayerMask.NameToLayer("Player"));
     }
 
     GameObject previousRoom;
