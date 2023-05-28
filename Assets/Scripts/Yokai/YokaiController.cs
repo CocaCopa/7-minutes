@@ -65,6 +65,7 @@ public class YokaiController : MonoBehaviour {
     private float stopFollowingTimer = 0;
     public bool GetIsChasing() => isChasing;
     public bool GetIsBehindPlayer() => isBehindPlayer;
+    public Transform GetYokaiTransform() => yokaiTransform;
     #endregion
 
     private void Awake() {

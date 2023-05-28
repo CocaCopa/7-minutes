@@ -267,6 +267,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 0bc66974c41ff8c4fa15f46d21ad3548, type: 3}
   footstepTimeWalking: 0.8
   footstepTimeRunning: 0.4
+  screamEffects:
+  - {fileID: 8300000, guid: 2e7e6a684c54d2849ba1c23f255e2113, type: 3}
+  - {fileID: 8300000, guid: df5ad75f0f12d2946bc7db0123146c98, type: 3}
+  - {fileID: 8300000, guid: 14e59916716136d4fb0df32cb5d09a79, type: 3}
+  heavyBreathing: {fileID: 8300000, guid: 8b2818102d4efff4e82f5e993a52f65d, type: 3}
 --- !u!1 &6209496650990332625
 GameObject:
   m_ObjectHideFlags: 0

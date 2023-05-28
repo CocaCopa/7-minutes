@@ -12,6 +12,7 @@ TagManager:
   - Floor/Concrete
   - Floor/Tile
   - Floor/Carpet
+  - Enemy
   layers:
   - Default
   - TransparentFX
