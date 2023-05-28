@@ -10,6 +10,11 @@ public class Door : ItemOpen, IInteractable {
         public Transform jumpscareTransform;
     }
 
+    [Header("--- SFX ---")]
+    [SerializeField] private AudioClip doorOpenSFX;
+    [SerializeField] private AudioClip doorCloseSFX;
+
+    [Header("--- Values ---")]
     [SerializeField] private bool needsKey = false;
     [HideInInspector]
     [SerializeField] private GameObject keyObject;
@@ -18,6 +23,7 @@ public class Door : ItemOpen, IInteractable {
     [HideInInspector]
     [SerializeField] private Transform jumpscarePosition;
 
+    private AudioSource audioSource;
     private PlayerInventory playerInventory;
 
     #region Custom Editor:
@@ -32,8 +38,9 @@ public class Door : ItemOpen, IInteractable {
 
     private void Awake() {
 
-        defaultPosition = transform.eulerAngles;
         playerInventory = FindObjectOfType<PlayerInventory>();
+        audioSource = GetComponentInChildren<AudioSource>();
+        defaultPosition = transform.eulerAngles;
         enabled = false;
     }
 
@@ -48,11 +55,18 @@ public class Door : ItemOpen, IInteractable {
         if (needsKey && !playerInventory.HasItem(keyObject)) {
             return;
         }
+        if (enabled) {
+            return;
+        }
 
         animationPoints = 0;
         currentPosition = transform.eulerAngles;
         targetPosition = isOpen ? defaultPosition : NewRotation();
 
+        AudioClip sfx = isOpen ? doorCloseSFX : doorOpenSFX;
+        audioSource.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+        audioSource.PlayOneShot(sfx, 0.65f);
+        
         isOpen = !isOpen;
 
         if (fireEvent) {

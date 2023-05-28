@@ -115,6 +115,7 @@ public class YokaiBehaviour : MonoBehaviour {
 
         int randomItem = UnityEngine.Random.Range(0, throwables.Count);
         Rigidbody rb = throwables[randomItem].GetComponent<Rigidbody>();
+        rb.isKinematic = false;
         rb.AddForce(direction * 30, ForceMode.Impulse);
     }
 
