@@ -8,6 +8,10 @@ TagManager:
   - Trigger/EnteredRoom
   - Trigger/YokaiBasementEvent
   - Trigger/UpstairsHallEvent
+  - Floor/Wood
+  - Floor/Concrete
+  - Floor/Tile
+  - Floor/Carpet
   layers:
   - Default
   - TransparentFX

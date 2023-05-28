@@ -27,7 +27,8 @@ public class PlayerMovement : MonoBehaviour {
     private Vector3 moveDirection;
     private bool groundedPlayer;
     private float currentSpeed;
-    public bool IsRunning() => currentSpeed > walkSpeed + 0.2f;
+    public bool GetIsRunning() => currentSpeed > walkSpeed + 0.2f;
+    public bool GetIsGrounded() => groundedPlayer;
 
     private void Awake() {
 
@@ -35,9 +36,7 @@ public class PlayerMovement : MonoBehaviour {
         controller = GetComponent<CharacterController>();
         cameraTransform = Camera.main.transform;
     }
-    public float distance;
-    public float radius;
-    public LayerMask layermask;
+
     public Vector3 HandleMovement() {
 
         groundedPlayer = IsGrounded();
@@ -116,9 +115,9 @@ public class PlayerMovement : MonoBehaviour {
         Vector3 origin = transform.position + Vector3.up;
         Vector3 direction = -transform.up;
         float radius = 0.31f; // Player collider radius
-        float maxDistance = 0.725f; // As much as it needs to hit the ground
+        float maxDistance = 0.73f; // As much as it needs to hit the ground
 
-        return Physics.SphereCast(new Ray(origin, direction), radius, maxDistance, ~LayerMask.NameToLayer("Player"));
+        return Physics.SphereCast(new Ray(origin, direction), radius, maxDistance, ~LayerMask.NameToLayer("Player"), QueryTriggerInteraction.Ignore);
     }
 
     GameObject previousRoom;

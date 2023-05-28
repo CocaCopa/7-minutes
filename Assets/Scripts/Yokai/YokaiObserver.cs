@@ -199,7 +199,7 @@ public class YokaiObserver : MonoBehaviour {
 
     private bool PlayerRun_WarningEvent() {
 
-        bool playerIsRunning = playerMovement.IsRunning();
+        bool playerIsRunning = playerMovement.GetIsRunning();
         bool yokaiIsChasing = controller.GetIsChasing();
 
         if (playerIsRunning && !yokaiIsChasing) {
