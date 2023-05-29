@@ -39,6 +39,7 @@ public class YokaiObserver : MonoBehaviour {
     private Transform playerTransform;
     private PlayerMovement playerMovement;
     private YokaiController controller;
+    private YokaiBehaviour yokaiBehaviour;
     private DungeonKeyItem dungeonKeyItem;
 
     private GameObject roomPlayerIsIn;
@@ -58,6 +59,7 @@ public class YokaiObserver : MonoBehaviour {
         Instance = this;
         playerMovement = FindObjectOfType<PlayerMovement>();
         controller = FindObjectOfType<YokaiController>();
+        yokaiBehaviour = FindObjectOfType<YokaiBehaviour>();
         dungeonKeyItem = FindObjectOfType<DungeonKeyItem>();
         playerTransform = playerMovement.gameObject.transform;
     }
@@ -67,6 +69,7 @@ public class YokaiObserver : MonoBehaviour {
         playerMovement.OnRoomEnter += PlayerMovement_OnRoomEnter;
         playerMovement.OnUpstairsHallEvent += PlayerMovement_OnUpstairsHallEvent;
         playerMovement.OnFoundDungeonDoor += PlayerMovement_OnFoundDungeonDoor;
+        yokaiBehaviour.OnChasePlayer += YokaiBehaviour_OnChasePlayer;
         dungeonKeyItem.OnDungeonKeyPickedUp += DungeonKeyItem_OnDungeonKeyPickedUp;
 
         Door[] doors = FindObjectsOfType<Door>();
@@ -251,6 +254,11 @@ public class YokaiObserver : MonoBehaviour {
             canFireOnChaseEvent = true;
             yokaiChaseTimer = 0;
         }
+    }
+
+    private void YokaiBehaviour_OnChasePlayer(object sender, EventArgs e) {
+
+        OnRunEventChase?.Invoke(this, EventArgs.Empty);
     }
 
     public int PlayerFloorIndex() {

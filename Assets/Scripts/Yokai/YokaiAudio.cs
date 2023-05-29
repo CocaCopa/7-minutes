@@ -15,11 +15,21 @@ public class YokaiAudio : MonoBehaviour {
     [SerializeField] private AudioClip[] chaceSFX;
     [SerializeField, Range(0, 100)] private float chanceToTriggerWarning;
 
+    [Header("--- Upstairs Hall JumpScare ---")]
+    [SerializeField] private AudioClip footsteps;
+    [SerializeField] private AudioClip jumpscareEffect;
+
+    [Header("--- Kill Player ---")]
+    [SerializeField] private AudioClip killScreamSFX;
+    [SerializeField] private AudioClip hitEffectJumpScare;
+
     private AudioSource audioSource;
+    private YokaiBehaviour yokaiBehaviour;
 
     private void Awake() {
-        
+
         audioSource = GetComponent<AudioSource>();
+        yokaiBehaviour = FindObjectOfType<YokaiBehaviour>();
     }
 
     private void Start() {
@@ -29,6 +39,19 @@ public class YokaiAudio : MonoBehaviour {
         YokaiObserver.Instance.OnBasementEventComplete += Observer_OnBasementEventComplete;
         YokaiObserver.Instance.OnRunEventChase += Observer_OnRunEventChase;
         YokaiObserver.Instance.OnRunEventWarning += Observer_OnRunEventWarning;
+        YokaiObserver.Instance.OnUpstairsHallJumpscare += Observer_OnUpstairsHallJumpscare;
+        yokaiBehaviour.OnKillPlayer += YokaiBehaviour_OnKillPlayer;
+    }
+
+    private void YokaiBehaviour_OnKillPlayer(object sender, System.EventArgs e) {
+
+        audioSource.PlayOneShot(killScreamSFX);
+        audioSource.PlayOneShot(hitEffectJumpScare);
+    }
+
+    private void Observer_OnUpstairsHallJumpscare(object sender, YokaiObserver.OnUpstairsHallJumpscareEventArgs e) {
+
+        audioSource.PlayOneShot(footsteps);
     }
 
     private void Observer_OnRunEventWarning(object sender, System.EventArgs e) {

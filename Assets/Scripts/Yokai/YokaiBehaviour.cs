@@ -7,17 +7,25 @@ public class YokaiBehaviour : MonoBehaviour {
 
     public event EventHandler OnYokaiSpawn;
     public event EventHandler OnYokaiDespawn;
+    public event EventHandler OnChasePlayer;
+    public event EventHandler OnKillPlayer;
 
     [SerializeField] private GameObject yokaiVisuals;
     [SerializeField] private List<GameObject> doors;
     [SerializeField] private List<GameObject> throwables;
+    [SerializeField] private Transform killPlayerTransform;
 
     private NavMeshAgent navMeshAgent;
     private GameObject equippedItem;
 
-    private bool isRunning;
+    private bool canFireKillEvent = true;
+    private bool canFireChaseEvent = true;
+    private bool isRunning = false;
     private bool disappearOnTargetPosition = false;
+    private bool playerKilled = false;
     private Vector3 targetPosition;
+
+    public bool GetPlayerKilled() => playerKilled;
 
     private void Awake() {
 
@@ -63,9 +71,11 @@ public class YokaiBehaviour : MonoBehaviour {
 
     public void DespawnCharacter() {
 
+        canFireChaseEvent = true;
         navMeshAgent.enabled = false;
         yokaiVisuals.SetActive(false);
 
+        transform.localPosition = Vector3.zero;
         OnYokaiDespawn?.Invoke(this, EventArgs.Empty);
     }
 
@@ -73,6 +83,11 @@ public class YokaiBehaviour : MonoBehaviour {
 
         if (!navMeshAgent.enabled) {
             return;
+        }
+
+        if (canFireChaseEvent) {
+            canFireChaseEvent = false;
+            OnChasePlayer?.Invoke(this, EventArgs.Empty);
         }
 
         Vector3 playerPosition = YokaiObserver.Instance.GetPlayerTransform().position;
@@ -126,9 +141,28 @@ public class YokaiBehaviour : MonoBehaviour {
         doors[randomIndex].GetComponent<IInteractable>().Interact();
     }
 
-    public void KillPlayer() {
+    public void KillPlayer(float rangeToKill) {
 
+        if (PlayerInRange(rangeToKill) && canFireKillEvent) {
 
+            canFireKillEvent = false;
+            navMeshAgent.enabled = false;
+            transform.position = killPlayerTransform.position;
+            transform.rotation = killPlayerTransform.rotation;
+            OnKillPlayer?.Invoke(this, EventArgs.Empty);
+            playerKilled = true;
+            //DespawnCharacter();
+        }
+    }
+
+    private bool PlayerInRange(float rangeToKill) {
+
+        Vector3 origin = transform.position;
+        Vector3 direction = transform.forward;
+        Ray ray = new(origin, direction);
+        Physics.Raycast(ray, out RaycastHit hit, rangeToKill);
+
+        return hit.transform != null && hit.transform.CompareTag("Player");
     }
 
     public void RunTowardsPosition(Vector3 position, bool despawnOnPositionReach = false) {
