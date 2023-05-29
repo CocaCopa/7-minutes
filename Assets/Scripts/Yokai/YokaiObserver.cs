@@ -49,14 +49,22 @@ public class YokaiObserver : MonoBehaviour {
     private float yokaiChaseTimer = 0;
     private bool canTriggerBasementEvent = false;
     private bool basementEventActive = false;
+    private bool doorEventActive = false;
     public bool GetBasementEventActive() => basementEventActive;
+    public bool GetDoorEventActive() => doorEventActive;
 
     public Transform GetPlayerTransform() => playerTransform;
     public GameObject GetRoomPlayerIsIn() => roomPlayerIsIn;
 
     private void Awake() {
 
-        Instance = this;
+        if (Instance == null) {
+
+            Instance = this;
+        }
+        else {
+            Destroy(this);
+        }
         playerMovement = FindObjectOfType<PlayerMovement>();
         controller = FindObjectOfType<YokaiController>();
         yokaiBehaviour = FindObjectOfType<YokaiBehaviour>();
@@ -66,11 +74,7 @@ public class YokaiObserver : MonoBehaviour {
 
     private void Start() {
 
-        playerMovement.OnRoomEnter += PlayerMovement_OnRoomEnter;
-        playerMovement.OnUpstairsHallEvent += PlayerMovement_OnUpstairsHallEvent;
-        playerMovement.OnFoundDungeonDoor += PlayerMovement_OnFoundDungeonDoor;
-        yokaiBehaviour.OnChasePlayer += YokaiBehaviour_OnChasePlayer;
-        dungeonKeyItem.OnDungeonKeyPickedUp += DungeonKeyItem_OnDungeonKeyPickedUp;
+        
 
         Door[] doors = FindObjectsOfType<Door>();
 
@@ -79,6 +83,32 @@ public class YokaiObserver : MonoBehaviour {
                 door.OnDoorOpen += Door_OnDoorOpen;
             }
         }
+    }
+
+    private void OnEnable() {
+
+        playerMovement.OnRoomEnter += PlayerMovement_OnRoomEnter;
+        playerMovement.OnUpstairsHallEvent += PlayerMovement_OnUpstairsHallEvent;
+        playerMovement.OnFoundDungeonDoor += PlayerMovement_OnFoundDungeonDoor;
+        yokaiBehaviour.OnChasePlayer += YokaiBehaviour_OnChasePlayer;
+        yokaiBehaviour.OnYokaiDespawn += YokaiBehaviour_OnYokaiDespawn;
+        dungeonKeyItem.OnDungeonKeyPickedUp += DungeonKeyItem_OnDungeonKeyPickedUp;
+    }
+
+    private void OnDisable() {
+
+        playerMovement.OnRoomEnter -= PlayerMovement_OnRoomEnter;
+        playerMovement.OnUpstairsHallEvent -= PlayerMovement_OnUpstairsHallEvent;
+        playerMovement.OnFoundDungeonDoor -= PlayerMovement_OnFoundDungeonDoor;
+        yokaiBehaviour.OnChasePlayer -= YokaiBehaviour_OnChasePlayer;
+        yokaiBehaviour.OnYokaiDespawn -= YokaiBehaviour_OnYokaiDespawn;
+        dungeonKeyItem.OnDungeonKeyPickedUp -= DungeonKeyItem_OnDungeonKeyPickedUp;
+    }
+
+    private void YokaiBehaviour_OnYokaiDespawn(object sender, EventArgs e) {
+
+        doorEventActive = false;
+        yokaiBehaviour.OnYokaiDespawn -= YokaiBehaviour_OnYokaiDespawn;
     }
 
     private void Update() {
@@ -104,6 +134,8 @@ public class YokaiObserver : MonoBehaviour {
         if (playerInsideEventRoom) {
             return;
         }
+
+        doorEventActive = true;
 
         if (e.isOpen) {
 
@@ -209,7 +241,7 @@ public class YokaiObserver : MonoBehaviour {
         bool playerIsRunning = playerMovement.GetIsRunning();
         bool yokaiIsChasing = controller.GetIsChasing();
 
-        if (playerIsRunning && !yokaiIsChasing && !basementEventActive) {
+        if (playerIsRunning && !yokaiIsChasing && !basementEventActive && !doorEventActive) {
 
             playerRunningTimer += Time.deltaTime;
 

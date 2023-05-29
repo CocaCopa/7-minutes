@@ -54,7 +54,7 @@ public class YokaiController : MonoBehaviour {
     private Transform playerTransform;
 
     private bool chasePlayer = false;
-    private bool doorJumpscareEvent = false;
+    //private bool doorJumpscareEvent = false;
     private bool isChasing = false;
     private bool isBehindPlayer = false;
     
@@ -80,14 +80,34 @@ public class YokaiController : MonoBehaviour {
     private void Start() {
 
         playerTransform = YokaiObserver.Instance.GetPlayerTransform();
+        behaviour.OnKillPlayer += Behaviour_OnKillPlayer;
+        GameManager.Instance.OnPlayerSpawn += GameManager_OnPlayerSpawn;
+    }
+
+    private void OnEnable() {
+
+        Invoke(nameof(SubscribeToEvents), 0.1f);
+    }
+
+    private void OnDisable() {
+
+        YokaiObserver.Instance.OnRunEventChase -= Observer_OnRunEventChase;
+        YokaiObserver.Instance.OnValidRoomEnter -= Observer_OnValidRoomEnter;
+        YokaiObserver.Instance.OnDoorOpenJumpscare -= Observer_OnDoorOpen;
+        YokaiObserver.Instance.OnUpstairsHallJumpscare -= Observer_OnUpstairsHallJumpscare;
+        YokaiObserver.Instance.OnBasementEventJumpscare -= Observer_OnBasementEventJumpscare;
+        YokaiObserver.Instance.OnBasementEventComplete -= Observer_OnBasementEventComplete;
+    }
+
+    private void SubscribeToEvents() {
+
         YokaiObserver.Instance.OnRunEventChase += Observer_OnRunEventChase;
         YokaiObserver.Instance.OnValidRoomEnter += Observer_OnValidRoomEnter;
         YokaiObserver.Instance.OnDoorOpenJumpscare += Observer_OnDoorOpen;
         YokaiObserver.Instance.OnUpstairsHallJumpscare += Observer_OnUpstairsHallJumpscare;
         YokaiObserver.Instance.OnBasementEventJumpscare += Observer_OnBasementEventJumpscare;
         YokaiObserver.Instance.OnBasementEventComplete += Observer_OnBasementEventComplete;
-        GameManager.Instance.OnPlayerSpawn += GameManager_OnPlayerSpawn;
-        behaviour.OnKillPlayer += Behaviour_OnKillPlayer;
+        behaviour.OnKillPlayer += Behaviour_OnKillPlayer1;
     }
 
     private void Behaviour_OnKillPlayer(object sender, EventArgs e) {
@@ -97,15 +117,15 @@ public class YokaiController : MonoBehaviour {
 
     private void Update() {
 
-        if (!doorJumpscareEvent) {
+        if (!YokaiObserver.Instance.GetDoorEventActive()) {
 
             ChasePlayerAction();
             SpawnedInRoomAction();
         }
 
-        if (CanAttackPlayer()) {
+        if (behaviour.IsActing()) {
 
-            behaviour.KillPlayer(rangeToKillPlayer);
+            behaviour.KillPlayer(rangeToKillPlayer, isBehindPlayer);
         }
 
         if (!behaviour.IsActing()) {
@@ -160,6 +180,11 @@ public class YokaiController : MonoBehaviour {
         }
     }
 
+
+    private void Behaviour_OnKillPlayer1(object sender, EventArgs e) {
+        isBehindPlayer = false;
+    }
+
     private void InteractWithDoors() {
 
         environmentInteractTimer += Time.deltaTime;
@@ -181,7 +206,7 @@ public class YokaiController : MonoBehaviour {
     private void ChasePlayerAction() {
 
         if (chasePlayer) {
-
+            
             isChasing = true;
             chaseTimer += Time.deltaTime;
 
@@ -330,7 +355,6 @@ public class YokaiController : MonoBehaviour {
 
         behaviour.SpawnAtPosition(jumpscareTransform);
         behaviour.RunTowardsPosition(jumpscareTransform.position);
-        doorJumpscareEvent = true;
         StartCoroutine(DisableDoorJumpScareEvent());
         
         OnYokaiJumpscare?.Invoke(this, EventArgs.Empty);
@@ -339,12 +363,6 @@ public class YokaiController : MonoBehaviour {
     private IEnumerator DisableDoorJumpScareEvent() {
 
         yield return new WaitForSeconds(timeToDisappearFromDoor);
-        doorJumpscareEvent = false;
-        behaviour.DespawnCharacter();
-    }
-    private void DisableJumpScareEvent() {
-
-        doorJumpscareEvent = false;
         behaviour.DespawnCharacter();
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private Transform respawnTransform;
     [SerializeField] private float interactDistance = 1.5f;
     [SerializeField] private LayerMask intercatLayer;
 

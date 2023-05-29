@@ -22,10 +22,7 @@ public class YokaiBehaviour : MonoBehaviour {
     private bool canFireChaseEvent = true;
     private bool isRunning = false;
     private bool disappearOnTargetPosition = false;
-    private bool playerKilled = false;
     private Vector3 targetPosition;
-
-    public bool GetPlayerKilled() => playerKilled;
 
     private void Awake() {
 
@@ -53,6 +50,7 @@ public class YokaiBehaviour : MonoBehaviour {
 
     public void SpawnAtPosition(Transform m_transform, bool agentEnabled = true) {
 
+        canFireKillEvent = true;
         transform.position = m_transform.position;
         transform.forward = m_transform.forward;
         yokaiVisuals.SetActive(true);
@@ -141,17 +139,32 @@ public class YokaiBehaviour : MonoBehaviour {
         doors[randomIndex].GetComponent<IInteractable>().Interact();
     }
 
-    public void KillPlayer(float rangeToKill) {
+    public void KillPlayer(float rangeToKill, bool behindPlayer) {
 
-        if (PlayerInRange(rangeToKill) && canFireKillEvent) {
+        bool kill = false;
 
+        if (behindPlayer) {
+
+            bool playerLooksBehind = Vector3.Dot(transform.forward, YokaiObserver.Instance.GetPlayerTransform().forward) < 0;
+
+            if (playerLooksBehind) {
+
+                kill = true;
+            }
+        }
+
+        if (PlayerInRange(rangeToKill) && !behindPlayer) {
+
+            kill = true;
+        }
+
+        if (kill && canFireKillEvent) {
+
+            OnKillPlayer?.Invoke(this, EventArgs.Empty);
             canFireKillEvent = false;
             navMeshAgent.enabled = false;
             transform.position = killPlayerTransform.position;
             transform.rotation = killPlayerTransform.rotation;
-            OnKillPlayer?.Invoke(this, EventArgs.Empty);
-            playerKilled = true;
-            //DespawnCharacter();
         }
     }
 
