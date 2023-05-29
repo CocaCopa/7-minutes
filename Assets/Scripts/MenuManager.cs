@@ -25,7 +25,7 @@ public class MenuManager : MonoBehaviour {
 
     private bool fadeHowToPlay = false;
     private bool startGame = false;
-    private bool pauseGame = true;
+    private bool pauseGame = false;
 
     private void Awake() {
 
@@ -40,11 +40,12 @@ public class MenuManager : MonoBehaviour {
             return;
         }
 
-        Cursor.visible = !pauseGame;
+        Cursor.visible = pauseGame;
+        CursorLockMode mode = pauseGame ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.lockState = mode;
 
         if (Input.GetKeyDown(KeyCode.Escape)) {
 
-            pauseGame = !pauseGame;
             ResumeGame();
         }
     }
@@ -68,9 +69,10 @@ public class MenuManager : MonoBehaviour {
 
     public void ResumeGame() {
 
-        Time.timeScale = Convert.ToInt32(pauseGame);
-        inputProvider.enabled = pauseGame;
-        pauseMenu.SetActive(!pauseGame);
+        pauseGame = !pauseGame;
+        Time.timeScale = Convert.ToInt32(!pauseGame);
+        inputProvider.enabled = !pauseGame;
+        pauseMenu.SetActive(pauseGame);
     }
 
     private void FadeHowToPlay() {

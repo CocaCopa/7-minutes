@@ -234,7 +234,7 @@ public class YokaiController : MonoBehaviour {
 
     private void Observer_OnValidRoomEnter(object sender, YokaiObserver.OnValidRoomEnterEventArgs e) {
 
-        if (isChasing || behaviour.IsActing()) {
+        if (isChasing || behaviour.IsActing() || YokaiObserver.Instance.GetBasementEventActive()) {
             return;
         }
 
