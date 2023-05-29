@@ -37,7 +37,7 @@ public class YokaiAudio : MonoBehaviour {
         if (chance > 0 && chance <= chanceToTriggerWarning) {
 
             int randomWarningSFX = Random.Range(0, runWarning.Length);
-            audioSource.PlayOneShot(runWarning[randomWarningSFX], 1.8f);
+            audioSource.PlayOneShot(runWarning[randomWarningSFX], 2.5f);
         }
     }
 

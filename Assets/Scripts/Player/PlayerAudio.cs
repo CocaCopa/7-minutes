@@ -38,6 +38,7 @@ public class PlayerAudio : MonoBehaviour {
         YokaiObserver.Instance.OnBasementEventJumpscare += Observer_OnBasementEventJumpscare;
         YokaiObserver.Instance.OnRunEventChase += Observer_OnRunEventChase;
         yokaiBehaviour.OnYokaiSpawn += YokaiBehaviour_OnYokaiSpawn;
+        yokaiBehaviour.OnYokaiDespawn += YokaiBehaviour_OnYokaiDespawn;
     }
 
     private void Update() {
@@ -71,6 +72,11 @@ public class PlayerAudio : MonoBehaviour {
     private void YokaiBehaviour_OnYokaiSpawn(object sender, System.EventArgs e) {
 
         audioSource.PlayOneShot(heavyBreathing);
+    }
+
+    private void YokaiBehaviour_OnYokaiDespawn(object sender, System.EventArgs e) {
+
+        yokaiIsChasing = false;
     }
 
     private void Observer_OnBasementEventJumpscare(object sender, System.EventArgs e) {
