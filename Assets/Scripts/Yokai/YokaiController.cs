@@ -107,11 +107,13 @@ public class YokaiController : MonoBehaviour {
         YokaiObserver.Instance.OnUpstairsHallJumpscare += Observer_OnUpstairsHallJumpscare;
         YokaiObserver.Instance.OnBasementEventJumpscare += Observer_OnBasementEventJumpscare;
         YokaiObserver.Instance.OnBasementEventComplete += Observer_OnBasementEventComplete;
-        behaviour.OnKillPlayer += Behaviour_OnKillPlayer1;
     }
 
     private void Behaviour_OnKillPlayer(object sender, EventArgs e) {
 
+        chasePlayer = false;
+        isChasing = false;
+        isBehindPlayer = false;
         StopAllCoroutines();
     }
 
@@ -160,8 +162,10 @@ public class YokaiController : MonoBehaviour {
 
         if (behaviour.IsActing() && isBehindPlayer) {
 
-            yokaiTransform.position = playerTransform.position - (playerTransform.position - yokaiTransform.position).normalized * 1.2f;
-            yokaiTransform.forward = (playerTransform.position - yokaiTransform.position).normalized;
+            float offset = 1.2f;
+            Vector3 positionTowardsPlayer = (playerTransform.position - yokaiTransform.position).normalized;
+            yokaiTransform.position = playerTransform.position - positionTowardsPlayer * offset;
+            yokaiTransform.forward = positionTowardsPlayer;
             Vector3 newHeight = yokaiTransform.position;
             newHeight.y = playerTransform.position.y + 1;
             yokaiTransform.position = newHeight;
@@ -178,11 +182,6 @@ public class YokaiController : MonoBehaviour {
                 behaviour.DespawnCharacter();
             }
         }
-    }
-
-
-    private void Behaviour_OnKillPlayer1(object sender, EventArgs e) {
-        isBehindPlayer = false;
     }
 
     private void InteractWithDoors() {

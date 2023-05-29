@@ -37,6 +37,7 @@ public class PlayerMovement : MonoBehaviour {
         cameraTransform = Camera.main.transform;
     }
 
+
     public Vector3 HandleMovement() {
 
         groundedPlayer = IsGrounded();
@@ -126,7 +127,7 @@ public class PlayerMovement : MonoBehaviour {
         if (other.CompareTag("Trigger/EnteredRoom")) {
             
             bool enteredDifferentRoom = other.gameObject != previousRoom;
-
+            
             if (enteredDifferentRoom) {
 
                 OnRoomEnter?.Invoke(this, new OnRoomEnterEventArgs {
