@@ -6,7 +6,6 @@ public class AudioManager : MonoBehaviour {
 
     [SerializeField] private GameObject ambientWhispers;
     [SerializeField] private AudioClip hitEffectJumpScare;
-    [SerializeField] private AudioClip thunderEffect;
     [SerializeField] private float fadeOutAmbientWhispersTime;
 
     private AudioSource audioSource;
@@ -37,7 +36,6 @@ public class AudioManager : MonoBehaviour {
             if (ambientWhispersAudioSource.volume <= 0.01f) {
 
                 ambientWhispers.SetActive(false);
-                audioSource.PlayOneShot(thunderEffect, 0.5f);
             }
         }
     }

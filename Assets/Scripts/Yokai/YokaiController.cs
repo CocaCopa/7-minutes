@@ -82,6 +82,13 @@ public class YokaiController : MonoBehaviour {
         playerTransform = YokaiObserver.Instance.GetPlayerTransform();
         behaviour.OnKillPlayer += Behaviour_OnKillPlayer;
         GameManager.Instance.OnPlayerSpawn += GameManager_OnPlayerSpawn;
+        GameManager.Instance.OnGameCompleted += GameManager_OnGameCompleted;
+    }
+
+    private void GameManager_OnGameCompleted(object sender, EventArgs e) {
+
+        behaviour.SpawnAtPosition(playerTransform, false);
+        behaviour.KillPlayer(rangeToKillPlayer, isBehindPlayer);
     }
 
     private void OnEnable() {

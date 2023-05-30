@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour {
     public event EventHandler<OnRoomEnterEventArgs> OnRoomEnter;
     public event EventHandler OnUpstairsHallEvent;
     public event EventHandler OnFoundDungeonDoor;
+    public event EventHandler OnMansionExit;
 
     public class OnRoomEnterEventArgs {
 
@@ -139,13 +140,17 @@ public class PlayerMovement : MonoBehaviour {
 
             previousRoom = other.gameObject;
         }
+        else if (other.CompareTag("Trigger/UpstairsHallEvent")) {
+
+            OnUpstairsHallEvent?.Invoke(this, EventArgs.Empty);
+        }
         else if (other.CompareTag("Trigger/YokaiBasementEvent")) {
 
             OnFoundDungeonDoor?.Invoke(this, EventArgs.Empty);
         }
-        else if (other.CompareTag("Trigger/UpstairsHallEvent")) {
+        else if (other.CompareTag("Trigger/ExitMansion")) {
 
-            OnUpstairsHallEvent?.Invoke(this, EventArgs.Empty);
+            OnMansionExit?.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -42,8 +42,6 @@ public class FadeScene : MonoBehaviour {
             animationPoints += transitionTime * Time.unscaledDeltaTime;
             canvasGroup.alpha = Mathf.Lerp(0, 1, curve.Evaluate(animationPoints));
 
-            
-
             if (canvasGroup.alpha == 1) {
 
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -51,13 +49,13 @@ public class FadeScene : MonoBehaviour {
         }
     }
     
-    public void ReloadScene(bool fade) {
+    public void ReloadScene(bool fadeout) {
 
         animationPoints = 0;
-        fadeOut = fade;
+        fadeOut = fadeout;
 
         if (!fadeOut) {
-
+                        
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
         }

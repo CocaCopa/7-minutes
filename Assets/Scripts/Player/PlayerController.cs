@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public event EventHandler OnMaskItemCollected;
+
     [SerializeField] private Transform respawnTransform;
     [SerializeField] private float interactDistance = 1.5f;
     [SerializeField] private LayerMask intercatLayer;
@@ -28,15 +30,32 @@ public class PlayerController : MonoBehaviour
 
     private void Input_OnInteractPerformed(object sender, EventArgs e) {
 
+        if (InteractableItem(out IInteractable interactable)) {
+
+            interactable.Interact();
+
+            if (interactable.GetType() == typeof(MaskItem)) {
+                OnMaskItemCollected?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+
+    private bool InteractableItem(out IInteractable interactable) {
+
         Vector3 rayOrigin = Camera.main.transform.position;
         Vector3 rayDirection = Camera.main.transform.forward;
         Ray ray = new (rayOrigin, rayDirection);
 
         Physics.Raycast(ray, out RaycastHit hit, interactDistance, intercatLayer);
-        
-        if (hit.transform != null && hit.transform.TryGetComponent(out IInteractable interactable)) {
 
-            interactable.Interact();
+        if (hit.transform != null && hit.transform.TryGetComponent(out interactable)) {
+
+            return true;
+        }
+        else {
+
+            interactable = null;
+            return false;
         }
     }
 

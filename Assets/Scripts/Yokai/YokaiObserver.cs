@@ -89,6 +89,8 @@ public class YokaiObserver : MonoBehaviour {
                 door.OnDoorOpen += Door_OnDoorOpen;
             }
         }
+        dungeonKeyItem.OnDungeonKeyPickedUp += DungeonKeyItem_OnDungeonKeyPickedUp;
+        playerMovement.OnFoundDungeonDoor += PlayerMovement_OnFoundDungeonDoor;
     }
 
     private void OnEnable() {
@@ -100,10 +102,9 @@ public class YokaiObserver : MonoBehaviour {
 
         playerMovement.OnRoomEnter += PlayerMovement_OnRoomEnter;
         playerMovement.OnUpstairsHallEvent += PlayerMovement_OnUpstairsHallEvent;
-        playerMovement.OnFoundDungeonDoor += PlayerMovement_OnFoundDungeonDoor;
         yokaiBehaviour.OnChasePlayer += YokaiBehaviour_OnChasePlayer;
         yokaiBehaviour.OnYokaiDespawn += YokaiBehaviour_OnYokaiDespawn;
-        dungeonKeyItem.OnDungeonKeyPickedUp += DungeonKeyItem_OnDungeonKeyPickedUp;
+        
         dungeonKey.SetActive(false);
     }
 
@@ -111,7 +112,6 @@ public class YokaiObserver : MonoBehaviour {
 
         playerMovement.OnRoomEnter -= PlayerMovement_OnRoomEnter;
         playerMovement.OnUpstairsHallEvent -= PlayerMovement_OnUpstairsHallEvent;
-        playerMovement.OnFoundDungeonDoor -= PlayerMovement_OnFoundDungeonDoor;
         yokaiBehaviour.OnChasePlayer -= YokaiBehaviour_OnChasePlayer;
         dungeonKeyItem.OnDungeonKeyPickedUp -= DungeonKeyItem_OnDungeonKeyPickedUp;
     }

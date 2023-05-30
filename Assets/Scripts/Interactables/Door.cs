@@ -14,16 +14,19 @@ public class Door : ItemOpen, IInteractable {
     [SerializeField] private AudioClip doorOpenSFX;
     [SerializeField] private AudioClip doorCloseSFX;
 
-    [Header("--- Values ---")]
+    [Header("--- Needs Key To Open ---")]
     [SerializeField] private bool needsKey = false;
     [HideInInspector]
     [SerializeField] private GameObject keyObject;
+    [SerializeField] private string lockedDoorTextUI = "Needs Key";
 
     [SerializeField] private bool fireEvent = false;
     [HideInInspector]
     [SerializeField] private Transform jumpscarePosition;
 
     private PlayerInventory playerInventory;
+
+    public void SetNeedsKey(bool value) => needsKey = value;
 
     #region Custom Editor:
     public bool GetNeedsKey() => needsKey;
@@ -111,8 +114,15 @@ public class Door : ItemOpen, IInteractable {
     public override string GetInteractableText() {
 
         if (needsKey) {
-            
-            return "Needs Key";
+
+            if (playerInventory.HasItem(keyObject)) {
+
+                return base.GetInteractableText();
+            }
+            else {
+
+                return lockedDoorTextUI;
+            }
         }
         else {
 
