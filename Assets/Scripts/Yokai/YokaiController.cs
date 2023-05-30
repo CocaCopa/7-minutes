@@ -125,7 +125,7 @@ public class YokaiController : MonoBehaviour {
             SpawnedInRoomAction();
         }
 
-        if (behaviour.IsActing()) {
+        if (behaviour.IsActing() || !YokaiObserver.Instance.GetBasementEventActive()) {
 
             behaviour.KillPlayer(rangeToKillPlayer, isBehindPlayer);
         }
@@ -135,12 +135,15 @@ public class YokaiController : MonoBehaviour {
             InteractWithDoors();
         }
 
-        SpawnBehindPlayer();
+        if (!YokaiObserver.Instance.GetBasementEventActive()) {
+
+            SpawnBehindPlayer();
+        }
     }
 
     private void SpawnBehindPlayer() {
 
-        if (!behaviour.IsActing() && !YokaiObserver.Instance.GetBasementEventActive()) {
+        if (!behaviour.IsActing()) {
 
             chanceTimer += Time.deltaTime;
 
@@ -276,7 +279,7 @@ public class YokaiController : MonoBehaviour {
 
         if (randomNumber > 0 && randomNumber <= chanceToSpawnOnRoomEnter) {
 
-            behaviour.DespawnCharacter(); // For safery, make sure that the character is not in then scene before calling SpawnAtPosition()
+            //behaviour.DespawnCharacter(); // For safery, make sure that the character is not in then scene before calling SpawnAtPosition()
             roomYokaiIsIn = e.room;
             List<Transform> validSpawns = YokaiBrain.GetValidRoomSpawnPositions();
             int randomIndex = UnityEngine.Random.Range(0, validSpawns.Count);

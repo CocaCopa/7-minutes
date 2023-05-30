@@ -36,6 +36,9 @@ public class YokaiObserver : MonoBehaviour {
     [SerializeField, Range(0,100)] private float chanceToTrigger;
     [SerializeField] private GameObject[] yokaiPathHolders;
 
+    [Header("--- On Room Enter ---")]
+    [SerializeField] private GameObject playerFirstSpawnRoom;
+    
     private Transform playerTransform;
     private PlayerMovement playerMovement;
     private YokaiController controller;
@@ -73,6 +76,7 @@ public class YokaiObserver : MonoBehaviour {
         yokaiBehaviour = FindObjectOfType<YokaiBehaviour>();
         dungeonKeyItem = FindObjectOfType<DungeonKeyItem>();
         playerTransform = playerMovement.gameObject.transform;
+        roomPlayerIsIn = playerFirstSpawnRoom;
     }
 
     private void Start() {
