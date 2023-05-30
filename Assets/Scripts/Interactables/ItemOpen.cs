@@ -11,8 +11,14 @@ public abstract class ItemOpen : MonoBehaviour, IInteractable {
     protected Vector3 targetPosition;
     protected float animationPoints = 0;
     protected bool isOpen = false;
+    protected AudioSource audioSource;
 
     public abstract void Interact();
+
+    public virtual string GetInteractableText() {
+
+        return "Open/Close";
+    }
 
     protected bool DisableUpdateMethod() => animationPoints <= 1;
     public bool GetIsOpen() => isOpen;

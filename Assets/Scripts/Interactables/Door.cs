@@ -23,7 +23,6 @@ public class Door : ItemOpen, IInteractable {
     [HideInInspector]
     [SerializeField] private Transform jumpscarePosition;
 
-    private AudioSource audioSource;
     private PlayerInventory playerInventory;
 
     #region Custom Editor:
@@ -106,6 +105,18 @@ public class Door : ItemOpen, IInteractable {
         else {  // both look at the opposite direction
 
             return defaultPosition - offsetAmount;
+        }
+    }
+
+    public override string GetInteractableText() {
+
+        if (needsKey) {
+            
+            return "Needs Key";
+        }
+        else {
+
+            return base.GetInteractableText();
         }
     }
 }

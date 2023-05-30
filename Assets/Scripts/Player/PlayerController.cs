@@ -21,6 +21,11 @@ public class PlayerController : MonoBehaviour
         InputManager.Instance.OnInteractPerformed += Input_OnInteractPerformed;
     }
 
+    private void Update() {
+
+        controller.Move(playerMovement.HandleMovement());
+    }
+
     private void Input_OnInteractPerformed(object sender, EventArgs e) {
 
         Vector3 rayOrigin = Camera.main.transform.position;
@@ -35,13 +40,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Update() {
+    public IInteractable GetInteractObject() {
 
-        if (Input.GetKeyDown(KeyCode.R)) {
-            Cursor.visible = !Cursor.visible;
-            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
+        Vector3 rayOrigin = Camera.main.transform.position;
+        Vector3 rayDirection = Camera.main.transform.forward;
+        Ray ray = new (rayOrigin, rayDirection);
+
+        Physics.Raycast(ray, out RaycastHit hit, interactDistance, intercatLayer);
+
+        if (hit.transform != null && hit.transform.TryGetComponent(out IInteractable interactable)) {
+
+            return interactable;
         }
 
-        controller.Move(playerMovement.HandleMovement());
+        return null;
     }
 }

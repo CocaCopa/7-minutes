@@ -2,8 +2,13 @@ using UnityEngine;
 
 public class Drawer : ItemOpen, IInteractable {
 
+    [Header("--- SFX ---")]
+    [SerializeField] private AudioClip openSFX;
+    [SerializeField] private AudioClip closeSFX;
+
     private void Awake() {
 
+        audioSource = GetComponentInChildren<AudioSource>();
         defaultPosition = transform.localPosition;
         enabled = false;
     }
@@ -19,6 +24,10 @@ public class Drawer : ItemOpen, IInteractable {
         animationPoints = 0;
         currentPosition = transform.localPosition;
         targetPosition = isOpen ? defaultPosition : defaultPosition + transform.forward * offsetAmount.magnitude;
+
+        AudioClip sfx = isOpen ? closeSFX : openSFX;
+        audioSource.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+        audioSource.PlayOneShot(sfx, 0.65f);
 
         isOpen = !isOpen;
         enabled = true;
