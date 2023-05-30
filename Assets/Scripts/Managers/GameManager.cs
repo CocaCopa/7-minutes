@@ -59,7 +59,11 @@ public class GameManager : MonoBehaviour
             script.enabled = true;
         }
 
-        GameObject.Find("Player").transform.position = new Vector3(-1.28100002f, 1.01199996f, -10.3859997f);
+        GameObject player = GameObject.Find("Player");
+        player.SetActive(false);
+        player.transform.position = new Vector3(-1.28100002f, 1.01199996f, -10.3859997f);
+        player.transform.eulerAngles = new Vector3(0, 90, 0);
+        player.SetActive(true);
         yokaiTransform.eulerAngles = Vector3.zero;
         yokaiTransform.localPosition = Vector3.zero;
 

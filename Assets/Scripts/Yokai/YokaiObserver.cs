@@ -46,6 +46,7 @@ public class YokaiObserver : MonoBehaviour {
     private DungeonKeyItem dungeonKeyItem;
 
     private GameObject roomPlayerIsIn;
+    private GameObject previousRoom;
     private bool canFireOnRunEvent = true;
     private bool canFireOnChaseEvent = true;
     private float playerRunningTimer = 0;
@@ -91,7 +92,7 @@ public class YokaiObserver : MonoBehaviour {
     }
 
     private void OnEnable() {
-
+        
         Invoke(nameof(SubscribeToEvents), 0.1f);
     }
 
@@ -112,18 +113,17 @@ public class YokaiObserver : MonoBehaviour {
         playerMovement.OnUpstairsHallEvent -= PlayerMovement_OnUpstairsHallEvent;
         playerMovement.OnFoundDungeonDoor -= PlayerMovement_OnFoundDungeonDoor;
         yokaiBehaviour.OnChasePlayer -= YokaiBehaviour_OnChasePlayer;
-        yokaiBehaviour.OnYokaiDespawn -= YokaiBehaviour_OnYokaiDespawn;
         dungeonKeyItem.OnDungeonKeyPickedUp -= DungeonKeyItem_OnDungeonKeyPickedUp;
     }
 
     private void YokaiBehaviour_OnYokaiDespawn(object sender, EventArgs e) {
-
+        
         doorEventActive = false;
         yokaiBehaviour.OnYokaiDespawn -= YokaiBehaviour_OnYokaiDespawn;
     }
 
     private void Update() {
-
+        
         PlayerRun_ChaseEvent();
     }
 
@@ -197,7 +197,7 @@ public class YokaiObserver : MonoBehaviour {
 
         // if player enters the "BasementEntrance" observer will fire an event
         TriggerBasementEvent(e.currentRoom);
-
+        previousRoom = e.previousRoom;
         roomPlayerIsIn = e.currentRoom;
         GameObject spawnsHolder = GameObject.Find(e.currentRoom.name + "_Spawns");
 
@@ -220,7 +220,7 @@ public class YokaiObserver : MonoBehaviour {
             YokaiBrain.SetValidRoomSpawnPositions(null);
         }
 
-        Debug.Log("Floor: " + PlayerFloorIndex() + " -- Room: " + e.currentRoom.name);
+        //Debug.Log("Floor: " + PlayerFloorIndex() + " -- Room: " + e.currentRoom.name);
     }
 
     private void TriggerBasementEvent(GameObject currentRoom) {

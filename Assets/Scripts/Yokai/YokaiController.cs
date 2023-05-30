@@ -109,11 +109,18 @@ public class YokaiController : MonoBehaviour {
         YokaiObserver.Instance.OnBasementEventComplete += Observer_OnBasementEventComplete;
     }
 
-    private void Behaviour_OnKillPlayer(object sender, EventArgs e) {
+    private void GameManager_OnPlayerSpawn(object sender, EventArgs e) {
 
+        behaviour.DespawnCharacter();
         chasePlayer = false;
         isChasing = false;
         isBehindPlayer = false;
+        roomYokaiIsIn = null;
+        sameRoomChaseTimer = 0;
+    }
+
+    private void Behaviour_OnKillPlayer(object sender, EventArgs e) {
+
         StopAllCoroutines();
     }
 
@@ -125,7 +132,7 @@ public class YokaiController : MonoBehaviour {
             SpawnedInRoomAction();
         }
 
-        if (behaviour.IsActing() || !YokaiObserver.Instance.GetBasementEventActive()) {
+        if (behaviour.IsActing() && !YokaiObserver.Instance.GetBasementEventActive()) {
 
             behaviour.KillPlayer(rangeToKillPlayer, isBehindPlayer);
         }
@@ -224,6 +231,9 @@ public class YokaiController : MonoBehaviour {
                 behaviour.DespawnCharacter();
             }
         }
+        else {
+            chaseTimer = 0;
+        }
     }
 
     private void SpawnedInRoomAction() {
@@ -264,11 +274,7 @@ public class YokaiController : MonoBehaviour {
             sameRoomChaseTimer = 0;
         }
     }
-    private void GameManager_OnPlayerSpawn(object sender, EventArgs e) {
-
-        behaviour.DespawnCharacter();
-    }
-
+    
     private void Observer_OnValidRoomEnter(object sender, YokaiObserver.OnValidRoomEnterEventArgs e) {
 
         if (isChasing || behaviour.IsActing() || YokaiObserver.Instance.GetBasementEventActive()) {
@@ -288,7 +294,7 @@ public class YokaiController : MonoBehaviour {
     }
 
     private void Observer_OnRunEventChase(object sender, System.EventArgs e) {
-
+        Debug.Log("---");
         int floorIndex = YokaiObserver.Instance.PlayerFloorIndex();
         Transform playerTransform = YokaiObserver.Instance.GetPlayerTransform();
         Vector3 playerPosition = playerTransform.position;
