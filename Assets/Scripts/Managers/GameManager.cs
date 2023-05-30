@@ -60,9 +60,10 @@ public class GameManager : MonoBehaviour
         }
 
         GameObject player = GameObject.Find("Player");
+        GameObject spawn = GameObject.Find("PlayerSpawn");
         player.SetActive(false);
-        player.transform.position = new Vector3(-1.28100002f, 1.01199996f, -10.3859997f);
-        player.transform.eulerAngles = new Vector3(0, 90, 0);
+        player.transform.position = spawn.transform.position;
+        player.transform.rotation = spawn.transform.rotation;
         player.SetActive(true);
         yokaiTransform.eulerAngles = Vector3.zero;
         yokaiTransform.localPosition = Vector3.zero;

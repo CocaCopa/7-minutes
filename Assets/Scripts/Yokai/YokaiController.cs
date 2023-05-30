@@ -114,13 +114,13 @@ public class YokaiController : MonoBehaviour {
         behaviour.DespawnCharacter();
         chasePlayer = false;
         isChasing = false;
-        isBehindPlayer = false;
         roomYokaiIsIn = null;
         sameRoomChaseTimer = 0;
     }
 
     private void Behaviour_OnKillPlayer(object sender, EventArgs e) {
 
+        isBehindPlayer = false;
         StopAllCoroutines();
     }
 
