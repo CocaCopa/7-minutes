@@ -8,13 +8,14 @@ public class MenuManager : MonoBehaviour {
     [Header("--- Start Game ---")]
     [SerializeField] private float delayGameStart = 1.85f;
     [SerializeField] private GameObject crosshairCanvas;
-    [SerializeField] CinemachineVirtualCamera mainVirtualCamera;
-    [SerializeField] CinemachineInputProvider inputProvider;
-    [SerializeField] GameObject cameraUI;
-    [SerializeField] AudioSource ambientRain;
+    [SerializeField] private CinemachineVirtualCamera mainVirtualCamera;
+    [SerializeField] private CinemachineInputProvider inputProvider;
+    [SerializeField] private GameObject cameraUI;
+    [SerializeField] private AudioSource ambientRain;
     [SerializeField] private float ambientRainGameplayPitch = 0.75f;
     [SerializeField] private float ambientRainMenuPitch = 2.5f;
-    [SerializeField] AudioSource ambientEnv;
+    [SerializeField] private AudioSource ambientEnv;
+    [SerializeField] private GameObject mainMenuGameObject;
 
     [Header("--- How To Play ---")]
     [SerializeField] private RectTransform howToPlayUIObject;
@@ -89,6 +90,7 @@ public class MenuManager : MonoBehaviour {
         cameraUI.SetActive(startGame);
         inputProvider.enabled = startGame;
         crosshairCanvas.SetActive(startGame);
+        mainMenuGameObject.SetActive(!startGame);
 
         float pitch = startGame ? ambientRainGameplayPitch : ambientRainMenuPitch;
         ambientRain.pitch = pitch;

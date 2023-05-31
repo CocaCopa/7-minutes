@@ -66,4 +66,21 @@ public class YokaiBrain : MonoBehaviour {
         // If no preferable spawn point found, return a random spawn point:
         return spawns[Random.Range(0,spawns.Count)];
     }
+
+    public static Vector3 CalculatePositionBehindPlayer(Transform playerTransform, Transform yokaiTransform, out Vector3 eulerAngles, out Vector3 lookDirection) {
+
+        float backOffset = 1.2f;
+        Vector3 directionTowardsPlayer = (playerTransform.position - yokaiTransform.position).normalized;
+        Vector3 positionXZ = playerTransform.position - directionTowardsPlayer * backOffset;
+        positionXZ.y = 0;
+        Vector3 positionY = new Vector3 (0, playerTransform.position.y + 1, 0);
+        Vector3 newYokaiPosition = positionXZ + positionY;
+
+        Vector3 newEulerAngles = yokaiTransform.eulerAngles;
+        newEulerAngles.x = newEulerAngles.z = 0;
+
+        lookDirection = directionTowardsPlayer;
+        eulerAngles = newEulerAngles;
+        return newYokaiPosition;
+    }
 }

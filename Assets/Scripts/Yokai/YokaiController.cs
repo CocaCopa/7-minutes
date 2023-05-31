@@ -17,6 +17,7 @@ public class YokaiController : MonoBehaviour {
     [SerializeField] private float acceleration;
 
     [Header("--- Interact with Environment ---")]
+    [Tooltip("Random time to interact with objects in the scene between the x-y values")]
     [SerializeField] private Vector2 environmentInteractTime;
 
     [Header("--- Chase ---")]
@@ -54,7 +55,6 @@ public class YokaiController : MonoBehaviour {
     private Transform playerTransform;
 
     private bool chasePlayer = false;
-    //private bool doorJumpscareEvent = false;
     private bool isChasing = false;
     private bool isBehindPlayer = false;
     
@@ -85,12 +85,6 @@ public class YokaiController : MonoBehaviour {
         GameManager.Instance.OnGameCompleted += GameManager_OnGameCompleted;
     }
 
-    private void GameManager_OnGameCompleted(object sender, EventArgs e) {
-
-        behaviour.SpawnAtPosition(playerTransform, false);
-        behaviour.KillPlayer(rangeToKillPlayer, isBehindPlayer);
-    }
-
     private void OnEnable() {
 
         Invoke(nameof(SubscribeToEvents), 0.1f);
@@ -116,6 +110,13 @@ public class YokaiController : MonoBehaviour {
         YokaiObserver.Instance.OnBasementEventComplete += Observer_OnBasementEventComplete;
     }
 
+    private void GameManager_OnGameCompleted(object sender, EventArgs e) {
+
+        behaviour.SpawnAtPosition(playerTransform, false);
+        SetPositionBehindPlayer();
+        behaviour.KillPlayer(rangeToKillPlayer, isBehindPlayer);
+    }
+
     private void GameManager_OnPlayerSpawn(object sender, EventArgs e) {
 
         behaviour.DespawnCharacter();
@@ -123,6 +124,7 @@ public class YokaiController : MonoBehaviour {
         isChasing = false;
         roomYokaiIsIn = null;
         sameRoomChaseTimer = 0;
+        stopFollowingTimer = 0;
     }
 
     private void Behaviour_OnKillPlayer(object sender, EventArgs e) {
@@ -179,17 +181,7 @@ public class YokaiController : MonoBehaviour {
 
         if (behaviour.IsActing() && isBehindPlayer) {
 
-            float offset = 1.2f;
-            Vector3 positionTowardsPlayer = (playerTransform.position - yokaiTransform.position).normalized;
-            yokaiTransform.position = playerTransform.position - positionTowardsPlayer * offset;
-            yokaiTransform.forward = positionTowardsPlayer;
-            Vector3 newHeight = yokaiTransform.position;
-            newHeight.y = playerTransform.position.y + 1;
-            yokaiTransform.position = newHeight;
-            Vector3 newEulerAngles = yokaiTransform.eulerAngles;
-            newEulerAngles.x = newEulerAngles.z = 0;
-            yokaiTransform.eulerAngles = newEulerAngles;
-
+            SetPositionBehindPlayer();
             stopFollowingTimer += Time.deltaTime;
 
             if (stopFollowingTimer > stopFollowingTime) {
@@ -199,6 +191,15 @@ public class YokaiController : MonoBehaviour {
                 behaviour.DespawnCharacter();
             }
         }
+    }
+
+    private void SetPositionBehindPlayer() {
+
+        Vector3 newEulerAngles;
+        Vector3 direction;
+        yokaiTransform.position = YokaiBrain.CalculatePositionBehindPlayer(playerTransform, yokaiTransform, out newEulerAngles, out direction);
+        yokaiTransform.forward = direction;
+        yokaiTransform.eulerAngles = newEulerAngles;
     }
 
     private void InteractWithDoors() {

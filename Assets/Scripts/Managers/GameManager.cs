@@ -13,8 +13,6 @@ public class GameManager : MonoBehaviour
     [Header("--- Game Completion ---")]
     [SerializeField] private GameObject[] entranceDoors = new GameObject[2];
     [SerializeField] private int totalMasksInGame;
-
-    [Header("--- Restart Game On Completion ---")]
     [SerializeField] private FadeScene fadeScene;
     [SerializeField] private float timeToRestart;
 
