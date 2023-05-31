@@ -113,7 +113,6 @@ public class YokaiObserver : MonoBehaviour {
         playerMovement.OnRoomEnter -= PlayerMovement_OnRoomEnter;
         playerMovement.OnUpstairsHallEvent -= PlayerMovement_OnUpstairsHallEvent;
         yokaiBehaviour.OnChasePlayer -= YokaiBehaviour_OnChasePlayer;
-        dungeonKeyItem.OnDungeonKeyPickedUp -= DungeonKeyItem_OnDungeonKeyPickedUp;
     }
 
     private void YokaiBehaviour_OnYokaiDespawn(object sender, EventArgs e) {

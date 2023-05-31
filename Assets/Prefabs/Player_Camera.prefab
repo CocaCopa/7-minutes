@@ -286,7 +286,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f0f794c67e9233d468a38d165590d253, type: 3}
   - {fileID: 8300000, guid: 1a7741daba5446e46a40f8074aae75dc, type: 3}
   - {fileID: 8300000, guid: 0bc66974c41ff8c4fa15f46d21ad3548, type: 3}
-  carpetSurface: []
+  carpetSurface:
+  - {fileID: 8300000, guid: 1f02fbfb2438ed040835c92b0d45b412, type: 3}
+  - {fileID: 8300000, guid: 6ebbbe217ba055c4185abebcb464003a, type: 3}
+  - {fileID: 8300000, guid: 1e1d0faa78b346b449d48c2ec1ef6f2a, type: 3}
+  - {fileID: 8300000, guid: 7a254ce1c65261e4890dd96cb7d620d4, type: 3}
+  - {fileID: 8300000, guid: 50e523e0eb5b96e45915aa6356203a20, type: 3}
   footstepTimeWalking: 0.8
   footstepTimeRunning: 0.4
   screamEffects:
@@ -294,6 +299,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: df5ad75f0f12d2946bc7db0123146c98, type: 3}
   - {fileID: 8300000, guid: 14e59916716136d4fb0df32cb5d09a79, type: 3}
   heavyBreathing: {fileID: 8300000, guid: 8b2818102d4efff4e82f5e993a52f65d, type: 3}
+  playerLines:
+  - {fileID: 8300000, guid: 81e75fde7545e004d9e4199c5d786b95, type: 3}
+  - {fileID: 8300000, guid: 21ced6ce2b4c36249a6870e7ddf42bf7, type: 3}
+  - {fileID: 8300000, guid: f0cf07463328c1949bfd4f85eb4606e6, type: 3}
+  scaredSFX: {fileID: 8300000, guid: 1e8d7dfa1d8bdf34ea124c5de148ce65, type: 3}
 --- !u!1 &6209496650990332625
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,7 +425,7 @@ MonoBehaviour:
   stairsLayer:
     serializedVersion: 2
     m_Bits: 128
-  walkSpeed: 1.1
+  walkSpeed: 1.79
   sprintSpeed: 4.3
   accelerationTime: 5
   jumpHeight: 0.5

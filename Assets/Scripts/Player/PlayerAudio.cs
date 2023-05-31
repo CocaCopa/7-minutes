@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class PlayerAudio : MonoBehaviour {
 
+    [Header("--- Footsteps ---")]
     [SerializeField] private AudioClip[] woodenSurface;
     [SerializeField] private AudioClip[] tileSurface;
     [SerializeField] private AudioClip[] concreteSurface;
@@ -12,9 +13,16 @@ public class PlayerAudio : MonoBehaviour {
     [Space(10)]
     [SerializeField] private float footstepTimeWalking;
     [SerializeField] private float footstepTimeRunning;
-    [Space(10)]
+
+    [Header("--- Yokai Near ---")]
     [SerializeField] private AudioClip[] screamEffects;
     [SerializeField] private AudioClip heavyBreathing;
+
+    [Header("--- Yokai Behind ---")]
+    [SerializeField] private AudioClip[] playerLines;
+
+    [Header("--- Basement Event ---")]
+    [SerializeField] private AudioClip scaredSFX;
 
     private AudioSource audioSource;
     private AudioClip previousClip;
@@ -39,6 +47,14 @@ public class PlayerAudio : MonoBehaviour {
         YokaiObserver.Instance.OnRunEventChase += Observer_OnRunEventChase;
         yokaiBehaviour.OnYokaiSpawn += YokaiBehaviour_OnYokaiSpawn;
         yokaiBehaviour.OnYokaiDespawn += YokaiBehaviour_OnYokaiDespawn;
+        yokaiController.OnSpawnBehindPlayer += YokaiController_OnSpawnBehindPlayer;
+    }
+
+    private void YokaiController_OnSpawnBehindPlayer(object sender, System.EventArgs e) {
+
+        audioSource.Stop();
+        int randomLineIdex = Random.Range(0, playerLines.Length);
+        audioSource.PlayOneShot(playerLines[randomLineIdex], 2.7f);
     }
 
     private void Update() {
@@ -71,7 +87,7 @@ public class PlayerAudio : MonoBehaviour {
 
     private void YokaiBehaviour_OnYokaiSpawn(object sender, System.EventArgs e) {
 
-        audioSource.PlayOneShot(heavyBreathing);
+        audioSource.PlayOneShot(heavyBreathing, 0.85f);
     }
 
     private void YokaiBehaviour_OnYokaiDespawn(object sender, System.EventArgs e) {
@@ -81,7 +97,8 @@ public class PlayerAudio : MonoBehaviour {
 
     private void Observer_OnBasementEventJumpscare(object sender, System.EventArgs e) {
 
-        audioSource.PlayOneShot(heavyBreathing);
+        audioSource.PlayOneShot(scaredSFX, 1.8f);
+        audioSource.PlayOneShot(heavyBreathing, 0.8f);
     }
 
     private void PlayFootstepAudio() {
