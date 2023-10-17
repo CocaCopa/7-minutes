@@ -229,12 +229,16 @@ public class YokaiObserver : MonoBehaviour {
             if (currentRoom.name == "BasementEntrance") {
 
                 canTriggerBasementEvent = false;
-                dungeonKey.SetActive(true);
+                Invoke(nameof(EnableDungeonKey), 3f);
                 spotLight.SetActive(true);
                 pointLight.SetActive(true);
                 OnBasementEventJumpscare?.Invoke(this, EventArgs.Empty);
             }
         }
+    }
+
+    private void EnableDungeonKey() {
+        dungeonKey.SetActive(true);
     }
 
     private void DungeonKeyItem_OnDungeonKeyPickedUp(object sender, EventArgs e) {
