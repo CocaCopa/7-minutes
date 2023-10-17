@@ -95,7 +95,7 @@ public class YokaiObserver : MonoBehaviour {
 
     private void OnEnable() {
         
-        Invoke(nameof(SubscribeToEvents), 0.1f);
+        Invoke(nameof(SubscribeToEvents), 0.5f);
     }
 
     private void SubscribeToEvents() {

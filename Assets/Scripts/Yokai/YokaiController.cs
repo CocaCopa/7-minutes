@@ -248,10 +248,7 @@ public class YokaiController : MonoBehaviour {
 
         if (!isChasing) {
 
-            bool playerInTheSameRoom = YokaiObserver.Instance.GetRoomPlayerIsIn() == roomYokaiIsIn;
-            bool playerLeftTheRoom = roomYokaiIsIn != null && YokaiObserver.Instance.GetRoomPlayerIsIn() != roomYokaiIsIn;
-
-            if (playerInTheSameRoom) {
+            if (YokaiObserver.Instance.GetRoomPlayerIsIn() == roomYokaiIsIn) {
 
                 sameRoomChaseTimer += Time.deltaTime;
                 despawnFromRoomTimer = 0;
@@ -263,7 +260,7 @@ public class YokaiController : MonoBehaviour {
                     chasePlayer = true;
                 }
             }
-            else if (playerLeftTheRoom) {
+            else if (roomYokaiIsIn != null && YokaiObserver.Instance.GetRoomPlayerIsIn() != roomYokaiIsIn) {
 
                 despawnFromRoomTimer += Time.deltaTime;
                 sameRoomChaseTimer = 0;
@@ -302,7 +299,6 @@ public class YokaiController : MonoBehaviour {
     }
 
     private void Observer_OnRunEventChase(object sender, System.EventArgs e) {
-        Debug.Log("---");
         int floorIndex = YokaiObserver.Instance.PlayerFloorIndex();
         Transform playerTransform = YokaiObserver.Instance.GetPlayerTransform();
         Vector3 playerPosition = playerTransform.position;
@@ -315,7 +311,7 @@ public class YokaiController : MonoBehaviour {
             return;
         }
 
-        List<Transform> spawns = new();
+        List<Transform> spawns;
 
         switch (floorIndex) {
 
@@ -329,6 +325,9 @@ public class YokaiController : MonoBehaviour {
             spawns = spawnsFloor_1;
             break;
             case 2:
+            spawns = spawnsFloor_2;
+            break;
+            default:
             spawns = spawnsFloor_2;
             break;
         }
