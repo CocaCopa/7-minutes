@@ -6,7 +6,7 @@ I thoroughly enjoyed the process of creating this prototype, and I'm confident t
 
 # Development Resources for the Project
 The assets I used can be found on the Unity Asset Store:  
-Synty Pack - Horror Mansion
+Synty Pack - Horror Mansion  
 https://assetstore.unity.com/packages/3d/environments/fantasy/polygon-horror-mansion-low-poly-3d-art-by-synty-213346
 
 Additionally, the audio was generated using free AI text-to-speech tools and subsequently edited by me through
