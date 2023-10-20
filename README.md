@@ -5,7 +5,7 @@ Though it's possible that some minor bugs might have slipped through the cracks 
 I thoroughly enjoyed the process of creating this prototype, and I'm confident that it has successfully achieved its intended purpose.
 
 # Development Resources for the Project
-The assets I used can be found on the Unity Asset Store:
+The assets I used can be found on the Unity Asset Store:  
 Synty Pack - Horror Mansion
 https://assetstore.unity.com/packages/3d/environments/fantasy/polygon-horror-mansion-low-poly-3d-art-by-synty-213346
 
